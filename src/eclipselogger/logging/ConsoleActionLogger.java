@@ -1,7 +1,12 @@
 package eclipselogger.logging;
 
+import eclipselogger.events.actions.AddFileAction;
 import eclipselogger.events.actions.CloseFileAction;
 import eclipselogger.events.actions.EclipseAction;
+import eclipselogger.events.actions.OpenNewFileAction;
+import eclipselogger.events.actions.RefactorFileAction;
+import eclipselogger.events.actions.RefactorPackageAction;
+import eclipselogger.events.actions.SaveFileAction;
 
 public class ConsoleActionLogger implements EclipseActiontLogIF {
 
@@ -9,6 +14,21 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 	public void logEclipseAction(EclipseAction action) {
 		if (action instanceof CloseFileAction) {
 			logCloseFileAction(action);
+		}
+		if (action instanceof OpenNewFileAction) {
+			logOpenedFileAction(action);
+		}
+		if (action instanceof AddFileAction) {
+			logAddedFileAction(action);
+		}
+		if (action instanceof RefactorFileAction) {
+			logFileRefactorAction(action);
+		}
+		if (action instanceof RefactorPackageAction) {
+			logPackageRefactorAction(action);
+		}
+		if (action instanceof SaveFileAction) {
+			logSavedFileAction(action);	
 		}
 		
 	}
@@ -19,6 +39,43 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		System.out.println("File closed: " + closeAction.getClosedFile().getProjectRelativePath());
 		System.out.println("Working time: " + closeAction.getWorkingFile().getWorkingTime() + " ms");
 		System.out.println("In same package: " + closeAction.closedInSamePackage() + ", in same project: " + closeAction.closedInSameProject() + ", same file type: " + closeAction.isTheSameTypeAsPreviuos());
+		System.out.println("============================================");
+	}
+	
+	private void logOpenedFileAction(EclipseAction action) {
+		OpenNewFileAction openAction = (OpenNewFileAction) action;
+		System.out.println("============================================");
+		System.out.println("File opened: " + openAction.getOpenedFile().getProjectRelativePath());
+		System.out.println("In same package: " + openAction.openedInSamePackage() + ", in same project: " + openAction.openedInSameProject() + ", same file type: " + openAction.isTheSameTypeAsPreviuos());
+		System.out.println("============================================");
+	}
+	
+	private void logAddedFileAction(EclipseAction action) {
+		AddFileAction openAction = (AddFileAction) action;
+		System.out.println("============================================");
+		System.out.println("File added: " + openAction.getAddedFile().getProjectRelativePath());
+		System.out.println("In same package: " + openAction.isSamePackage() + ", in same project: " + openAction.isSameProject());
+		System.out.println("============================================");
+	}
+	
+	private void logFileRefactorAction(EclipseAction action) {
+		RefactorFileAction fileAction = (RefactorFileAction) action;
+		System.out.println("============================================");
+		System.out.println("File refactored, old:" + fileAction.getOldFilePath() + ", new: " + fileAction.getNewFilePath());
+		System.out.println("============================================");
+	}
+	
+	private void logPackageRefactorAction(EclipseAction action) {
+		RefactorPackageAction packageAction = (RefactorPackageAction) action;
+		System.out.println("============================================");
+		System.out.println("Package refactored, old:" + packageAction.getOldFilePath() + ", new: " + packageAction.getNewFilePath());
+		System.out.println("============================================");
+	}
+	
+	private void logSavedFileAction(EclipseAction action) {
+		SaveFileAction saveAction = (SaveFileAction) action;
+		System.out.println("============================================");
+		System.out.println("File saved: " + saveAction.getFile().getProjectRelativePath());
 		System.out.println("============================================");
 	}
 

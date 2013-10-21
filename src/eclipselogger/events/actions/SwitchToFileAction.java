@@ -16,7 +16,7 @@ public class SwitchToFileAction extends EclipseAction {
 	public SwitchToFileAction(IFile openedFile, IFile previousFile) {
 		this.openedFile = openedFile;
 		this.previousFile = previousFile;
-		samePackage = PackageUtils.checkIfSameDirectory(openedFile, previousFile);
+		samePackage = PackageUtils.checkIfSamePackage(openedFile, previousFile);
 		sameProject = PackageUtils.checkIfSameProject(openedFile, previousFile);
 		sameFileType = FileValidator.haveFilesTheSameExtension(openedFile, previousFile);
 	}

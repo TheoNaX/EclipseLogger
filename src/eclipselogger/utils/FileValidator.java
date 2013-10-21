@@ -42,6 +42,9 @@ public class FileValidator {
 	
 	public static boolean haveFilesTheSameExtension(IFile firstFile, IFile secondFile) {
 		boolean result = false;
+		if (firstFile == null || secondFile == null) {
+			return result;
+		}
 		String firstExt = firstFile.getFileExtension();
 		String secondExt = secondFile.getFileExtension();
 		if (firstExt == null && secondExt == null) {

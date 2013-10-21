@@ -17,7 +17,7 @@ public class CloseFileAction extends EclipseAction {
 	public CloseFileAction(IFile closedFile, IFile previousFile, WorkingFile workFile) {
 		this.closedFile = closedFile;
 		this.previousFile = previousFile;
-		samePackage = PackageUtils.checkIfSameDirectory(closedFile, previousFile);
+		samePackage = PackageUtils.checkIfSamePackage(closedFile, previousFile);
 		sameProject = PackageUtils.checkIfSameProject(closedFile, previousFile);
 		sameFileType = FileValidator.haveFilesTheSameExtension(closedFile, previousFile);
 		this.workFile = workFile;

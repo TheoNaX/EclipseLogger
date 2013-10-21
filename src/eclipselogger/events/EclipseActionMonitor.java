@@ -6,10 +6,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 
+import eclipselogger.events.actions.AddFileAction;
+import eclipselogger.events.actions.AddPackageAction;
 import eclipselogger.events.actions.CloseFileAction;
 import eclipselogger.events.actions.EclipseAction;
+import eclipselogger.events.actions.OpenNewFileAction;
+import eclipselogger.events.actions.RefactorFileAction;
+import eclipselogger.events.actions.RefactorPackageAction;
+import eclipselogger.events.actions.SaveFileAction;
+import eclipselogger.events.actions.SwitchToFileAction;
 import eclipselogger.logging.ConsoleActionLogger;
 import eclipselogger.logging.EclipseActiontLogIF;
 
@@ -81,10 +89,60 @@ public class EclipseActionMonitor {
 	
 	public static void openNewFile(IFile file) {
 		setActualFile(file);
+		OpenNewFileAction openAction = new OpenNewFileAction(file, previousFile);
+		logger.logEclipseAction(openAction);
 	}
 	
 	public static void switchToFile(IFile file) {
 		setActualFile(file);
+		SwitchToFileAction switchAction = new SwitchToFileAction(file, previousFile);
+		logger.logEclipseAction(switchAction);
+	}
+	
+	public static void refactorPackage(IFolder oldPack, IFolder newPack) {
+		RefactorPackageAction refPackAction = new RefactorPackageAction(oldPack.getProjectRelativePath().toOSString(), newPack.getProjectRelativePath().toOSString());
+		logger.logEclipseAction(refPackAction);
+	}
+	
+	public static void refactorFile(IFile oldFile, IFile newFile) {
+		RefactorFileAction refFileAction = new RefactorFileAction(oldFile.getProjectRelativePath().toOSString(), newFile.getProjectRelativePath().toOSString());
+		logger.logEclipseAction(refFileAction);
+	}
+	
+	public static void addFolder(IFolder folder) {
+		AddPackageAction action = new AddPackageAction(folder, actualFile);
+		logger.logEclipseAction(action);
+	}
+	
+	public static void deleteFolder(IFolder folder) {
+		// TODO
+	}
+	
+	public static void addFile(IFile file) {
+		AddFileAction action = new AddFileAction(file, actualFile);
+		logger.logEclipseAction(action);
+	}
+	
+	public static void deleteFile(IFile file) {
+		// TODO
+	}
+	
+	public static void fileChanged(IFile file) {
+		if (file.equals(actualFile)) {
+			WorkingFile saved = workingFiles.get(file.getProjectRelativePath().toOSString());
+			SaveFileAction saveAction = new SaveFileAction(file, saved);
+			logger.logEclipseAction(saveAction);
+		}
+	}
+
+	public static void addProject(IProject project) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void deleteProject(IProject project) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

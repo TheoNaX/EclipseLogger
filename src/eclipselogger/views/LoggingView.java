@@ -47,11 +47,7 @@ public class LoggingView extends ViewPart {
        label.setText("Hello World");
        Workbench.getInstance().getActiveWorkbenchWindow().getPartService().addPartListener(listener);
        ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener,
-    	       IResourceChangeEvent.PRE_CLOSE
-    	       | IResourceChangeEvent.PRE_DELETE
-    	       | IResourceChangeEvent.PRE_BUILD
-    	       | IResourceChangeEvent.POST_BUILD
-    	       | IResourceChangeEvent.POST_CHANGE);
+    	       IResourceChangeEvent.POST_CHANGE);
     }
     public void setFocus() {
        // set focus to my widget.  For a label, this doesn't
