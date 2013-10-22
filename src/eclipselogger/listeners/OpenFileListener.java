@@ -46,7 +46,7 @@ public class OpenFileListener implements IPartListener2 {
 			IEditorInput input = editor.getEditorInput();
 			if (input instanceof IFileEditorInput) {
 				IFile file = ((IFileEditorInput)input).getFile();
-				System.out.println("Closed file: " + file.getProjectRelativePath());
+				//System.out.println("Closed file: " + file.getProjectRelativePath());
 				EclipseActionMonitor.closeFile(file);
 			}
 		}

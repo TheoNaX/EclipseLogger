@@ -13,6 +13,9 @@ public class DeleteFileAction extends EclipseAction {
 	private boolean sameProject;
 	private boolean sameFileType;
 	
+	// TODO implement working file - how long programmer worked with file
+	// TODO implement count of deleted files within some period ???
+	
 	public DeleteFileAction(IFile deletedFile, IFile previoiusFile) {
 		this.deletedFile = deletedFile;
 		this.previousFile = previoiusFile;

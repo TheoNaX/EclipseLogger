@@ -11,7 +11,11 @@ import org.eclipse.core.resources.IProject;
 
 import eclipselogger.events.actions.AddFileAction;
 import eclipselogger.events.actions.AddPackageAction;
+import eclipselogger.events.actions.AddProjectAction;
 import eclipselogger.events.actions.CloseFileAction;
+import eclipselogger.events.actions.DeleteFileAction;
+import eclipselogger.events.actions.DeletePackageAction;
+import eclipselogger.events.actions.DeleteProjectAction;
 import eclipselogger.events.actions.EclipseAction;
 import eclipselogger.events.actions.OpenNewFileAction;
 import eclipselogger.events.actions.RefactorFileAction;
@@ -73,7 +77,7 @@ public class EclipseActionMonitor {
 		}
 	}
 	
-	public static WorkingFile closeFile(IFile file) {
+	public static void closeFile(IFile file) {
 		WorkingFile closed = workingFiles.remove(file.getProjectRelativePath().toOSString());
 		IFile previous = null;
 		if (file.equals(getActualFile())) {
@@ -83,8 +87,6 @@ public class EclipseActionMonitor {
 		}
 		CloseFileAction closeAction = new CloseFileAction(file, previous, closed);
 		logger.logEclipseAction(closeAction);
-		
-		return closed;
 	}
 	
 	public static void openNewFile(IFile file) {
@@ -115,7 +117,8 @@ public class EclipseActionMonitor {
 	}
 	
 	public static void deleteFolder(IFolder folder) {
-		// TODO
+		DeletePackageAction action = new DeletePackageAction(folder, actualFile);
+		logger.logEclipseAction(action);
 	}
 	
 	public static void addFile(IFile file) {
@@ -124,7 +127,14 @@ public class EclipseActionMonitor {
 	}
 	
 	public static void deleteFile(IFile file) {
-		// TODO
+		IFile previous;
+		if (file.equals(actualFile)) {
+			previous = previousFile;
+		} else {
+			previous = actualFile;
+		}
+		DeleteFileAction deleteFile = new DeleteFileAction(file, previous);
+		logger.logEclipseAction(deleteFile);
 	}
 	
 	public static void fileChanged(IFile file) {
@@ -136,13 +146,13 @@ public class EclipseActionMonitor {
 	}
 
 	public static void addProject(IProject project) {
-		// TODO Auto-generated method stub
-		
+		AddProjectAction action = new AddProjectAction(project);
+		logger.logEclipseAction(action);
 	}
 
 	public static void deleteProject(IProject project) {
-		// TODO Auto-generated method stub
-		
+		DeleteProjectAction action = new DeleteProjectAction(project);
+		logger.logEclipseAction(action);
 	}
 	
 	

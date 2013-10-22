@@ -1,7 +1,10 @@
 package eclipselogger.logging;
 
 import eclipselogger.events.actions.AddFileAction;
+import eclipselogger.events.actions.AddPackageAction;
 import eclipselogger.events.actions.CloseFileAction;
+import eclipselogger.events.actions.DeleteFileAction;
+import eclipselogger.events.actions.DeletePackageAction;
 import eclipselogger.events.actions.EclipseAction;
 import eclipselogger.events.actions.OpenNewFileAction;
 import eclipselogger.events.actions.RefactorFileAction;
@@ -21,6 +24,9 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		if (action instanceof AddFileAction) {
 			logAddedFileAction(action);
 		}
+		if (action instanceof DeleteFileAction) {
+			logDeleteFileAction(action);
+		}
 		if (action instanceof RefactorFileAction) {
 			logFileRefactorAction(action);
 		}
@@ -30,9 +36,24 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		if (action instanceof SaveFileAction) {
 			logSavedFileAction(action);	
 		}
+		if (action instanceof AddPackageAction) {
+			logPackageAdded(action);
+		}
+		if (action instanceof DeletePackageAction) {
+			logPackageDeleted(action);
+		}
 		
 	}
 	
+	private void logDeleteFileAction(EclipseAction action) {
+		DeleteFileAction deleteAction = (DeleteFileAction) action;
+		System.out.println("============================================");
+		System.out.println("File deleted: " + deleteAction.getDeletedFile().getProjectRelativePath());
+		//System.out.println("Working time: " + deleteAction.getWorkingFile().getWorkingTime() + " ms");
+		System.out.println("In same package: " + deleteAction.isSamePackage() + ", in same project: " + deleteAction.isSameProject() + ", same file type: " + deleteAction.isSameFileType());
+		System.out.println("============================================");
+	}
+
 	private void logCloseFileAction(EclipseAction action) {
 		CloseFileAction closeAction = (CloseFileAction) action;
 		System.out.println("============================================");
@@ -78,5 +99,25 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		System.out.println("File saved: " + saveAction.getFile().getProjectRelativePath());
 		System.out.println("============================================");
 	}
+	
+	private void logPackageAdded(EclipseAction action) {
+		AddPackageAction addAction = (AddPackageAction) action;
+		System.out.println("============================================");
+		System.out.println("Package added: " + addAction.getAddedPackage().getProjectRelativePath());
+		System.out.println("Is in same package: " + addAction.isSamePackage());
+		System.out.println("Is in same project: " + addAction.isSameProject());
+		System.out.println("============================================");
+	}
+	
+	private void logPackageDeleted(EclipseAction action) {
+		DeletePackageAction deleteAction = (DeletePackageAction) action;
+		System.out.println("============================================");
+		System.out.println("Package deleted: " + deleteAction.getAddedPackage().getProjectRelativePath());
+		System.out.println("Is in same package: " + deleteAction.isSamePackage());
+		System.out.println("Is in same project: " + deleteAction.isSameProject());
+		System.out.println("============================================");
+	}
+	
+	
 
 }
