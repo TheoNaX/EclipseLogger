@@ -24,6 +24,10 @@ import eclipselogger.events.actions.SaveFileAction;
 import eclipselogger.events.actions.SwitchToFileAction;
 import eclipselogger.logging.ConsoleActionLogger;
 import eclipselogger.logging.EclipseActiontLogIF;
+import eclipselogger.utils.ActualFileContentCache;
+import eclipselogger.utils.FileChanges;
+import eclipselogger.utils.FileComparator;
+import eclipselogger.utils.FileUtilities;
 
 public class EclipseActionMonitor {
 	private static IFile actualFile;
@@ -34,6 +38,8 @@ public class EclipseActionMonitor {
 	// logger
 	private static EclipseActiontLogIF logger = new ConsoleActionLogger();
 	
+	private static ActualFileContentCache fileContentCache = new ActualFileContentCache(); 
+	
 	private static final int LAST_ACTIONS_PRESERVED_COUNT = 10;
 	
 	private static HashMap<String, WorkingFile> workingFiles = new LinkedHashMap<String, WorkingFile>();
@@ -41,9 +47,26 @@ public class EclipseActionMonitor {
 	
 	public static void setActualFile(IFile file) {
 		updateActualFile(file);
+		
+		// TODO how to find out if the file is really worked with, implement some time filter
+		// programmer must work with file at least 5 seconds
 		previousFile = actualFile;
 		actualFile = file;
+		
+		// store file content of opened / switched file
+		setActualFileContent(file);
+		
+		// check if file was already used, if not store it to working files
 		checkWorkingFileAndAddIfNotInWorking(file);
+	}
+	
+	/**
+	 * Stores actual file content as String to cache
+	 * @param file
+	 */
+	private static void setActualFileContent(IFile file) {
+		String content = FileUtilities.fileContentToString(file);
+		fileContentCache.setActualFileText(content);
 	}
 	
 	public static IFile getActualFile() {
@@ -57,7 +80,7 @@ public class EclipseActionMonitor {
 	private static void checkWorkingFileAndAddIfNotInWorking(IFile file) {
 		// TODO really use project relative? If more projects with the same packages? 
 		fileWorkStart = System.currentTimeMillis();
-		if (!workingFiles.containsKey(file.getProjectRelativePath())) {
+		if (!workingFiles.containsKey(file.getProjectRelativePath().toOSString())) {
 			WorkingFile workFile = new WorkingFile(file);
 			workingFiles.put(workFile.getWorkingFileKey(), workFile);
 		}
@@ -71,8 +94,18 @@ public class EclipseActionMonitor {
 			long workTime = stopWork - fileWorkStart;
 			WorkingFile workFile = workingFiles.get(actualFile.getProjectRelativePath().toOSString());
 			if (workFile != null) {
-				System.out.println("Working file is not null, increasing working time");
+				System.out.println("Update file: Working file is not null, increasing working time");
 				workFile.increaseWorkingTime(workTime);
+				
+				System.out.println(">>>>> Resolving file changes ...");
+				String fileContent = FileUtilities.fileContentToString(actualFile);
+				FileChanges changes = FileComparator.getFileChanges(fileContentCache.getActualFileText(), fileContent);
+				
+				if (changes != null) {
+					System.out.println(">>>> Updating file changes: " + changes);
+					workFile.getFileChanges().updateFileChanges(changes);
+				}
+				
 			}
 		}
 	}
@@ -107,7 +140,7 @@ public class EclipseActionMonitor {
 	}
 	
 	public static void refactorFile(IFile oldFile, IFile newFile) {
-		RefactorFileAction refFileAction = new RefactorFileAction(oldFile.getProjectRelativePath().toOSString(), newFile.getProjectRelativePath().toOSString());
+		RefactorFileAction refFileAction = new RefactorFileAction(oldFile, newFile);
 		logger.logEclipseAction(refFileAction);
 	}
 	
@@ -133,7 +166,8 @@ public class EclipseActionMonitor {
 		} else {
 			previous = actualFile;
 		}
-		DeleteFileAction deleteFile = new DeleteFileAction(file, previous);
+		WorkingFile deleted = workingFiles.remove(file.getProjectRelativePath().toOSString());
+		DeleteFileAction deleteFile = new DeleteFileAction(file, previous, deleted);
 		logger.logEclipseAction(deleteFile);
 	}
 	
