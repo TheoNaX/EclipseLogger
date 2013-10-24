@@ -2,9 +2,12 @@ package eclipselogger.events;
 
 import org.eclipse.core.resources.IFile;
 
+import eclipselogger.utils.FileChanges;
+
 public class WorkingFile {
 	private IFile file;
 	private long workingTime;
+	private FileChanges fileChanges = new FileChanges();
 	
 	public WorkingFile(IFile file) {
 		this.file = file;
@@ -20,6 +23,10 @@ public class WorkingFile {
 	
 	public long getWorkingTime() {
 		return this.workingTime;
+	}
+	
+	public FileChanges getFileChanges() {
+		return this.fileChanges;
 	}
 	
 }
