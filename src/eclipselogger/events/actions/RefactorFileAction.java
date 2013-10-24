@@ -1,5 +1,7 @@
 package eclipselogger.events.actions;
 
+import org.eclipse.core.resources.IFile;
+
 public class RefactorFileAction extends EclipseAction {
 	
 	public static final String FILE_RENAME = "FILE_RENAME";
@@ -9,9 +11,12 @@ public class RefactorFileAction extends EclipseAction {
 	private String newFilePath;
 	private String refactorType;
 	
-	public RefactorFileAction(String oldFilePath, String newFilePath) {
-		this.oldFilePath = oldFilePath;
-		this.newFilePath = newFilePath;
+	// TODO implement type of refactoring
+	
+	public RefactorFileAction(IFile oldFile, IFile newFile) {
+		this.oldFilePath = oldFile.getProjectRelativePath().toOSString();
+		this.newFilePath = newFile.getProjectRelativePath().toOSString();
+		this.refactorType = resolveRefactorType(oldFile, newFile);
 	}
 
 	public String getOldFilePath() {
@@ -26,7 +31,16 @@ public class RefactorFileAction extends EclipseAction {
 		return refactorType;
 	}
 	
-	
+	private static String resolveRefactorType(IFile oldFile, IFile newFile) {
+		if (oldFile == null || newFile == null) {
+			return null;
+		}
+		if (oldFile.getName().equals(newFile.getName())) {
+			return FILE_MOVE;
+		} else {
+			return FILE_RENAME;
+		}
+	}
 	
 	
 }
