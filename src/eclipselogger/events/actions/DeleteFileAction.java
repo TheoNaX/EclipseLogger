@@ -2,6 +2,7 @@ package eclipselogger.events.actions;
 
 import org.eclipse.core.resources.IFile;
 
+import eclipselogger.events.WorkingFile;
 import eclipselogger.utils.FileValidator;
 import eclipselogger.utils.PackageUtils;
 
@@ -12,13 +13,14 @@ public class DeleteFileAction extends EclipseAction {
 	private boolean samePackage;
 	private boolean sameProject;
 	private boolean sameFileType;
+	private WorkingFile workFile;
 	
-	// TODO implement working file - how long programmer worked with file
 	// TODO implement count of deleted files within some period ???
 	
-	public DeleteFileAction(IFile deletedFile, IFile previoiusFile) {
+	public DeleteFileAction(IFile deletedFile, IFile previoiusFile, WorkingFile workFile) {
 		this.deletedFile = deletedFile;
 		this.previousFile = previoiusFile;
+		this.workFile = workFile;
 		samePackage = PackageUtils.checkIfSamePackage(deletedFile, previoiusFile);
 		sameProject = PackageUtils.checkIfSameProject(deletedFile, previoiusFile);
 		sameFileType = FileValidator.haveFilesTheSameExtension(deletedFile, previoiusFile);
@@ -44,6 +46,9 @@ public class DeleteFileAction extends EclipseAction {
 		return sameFileType;
 	}
 	
+	public WorkingFile getWorkingFile() {
+		return this.workFile;
+	}
 	
 	
 }
