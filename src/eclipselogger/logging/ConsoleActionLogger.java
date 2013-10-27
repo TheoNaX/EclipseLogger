@@ -9,7 +9,6 @@ import eclipselogger.events.actions.EclipseAction;
 import eclipselogger.events.actions.OpenNewFileAction;
 import eclipselogger.events.actions.RefactorFileAction;
 import eclipselogger.events.actions.RefactorPackageAction;
-import eclipselogger.events.actions.SaveFileAction;
 import eclipselogger.events.actions.SwitchToFileAction;
 
 public class ConsoleActionLogger implements EclipseActiontLogIF {
@@ -33,9 +32,6 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		}
 		if (action instanceof RefactorPackageAction) {
 			logPackageRefactorAction(action);
-		}
-		if (action instanceof SaveFileAction) {
-			logSavedFileAction(action);	
 		}
 		if (action instanceof AddPackageAction) {
 			logPackageAdded(action);
@@ -62,6 +58,7 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		} else {
 			System.out.println("Deleted file was not worked with!!!");
 		}
+		logCommonParams(action);
 		System.out.println("============================================");
 	}
 
@@ -75,6 +72,7 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 			System.out.println("Working time: " + closeAction.getWorkingFile().getWorkingTime() + " ms");
 			System.out.println(closeAction.getWorkingFile().getFileChanges());
 		}
+		logCommonParams(action);
 		System.out.println("============================================");
 	}
 	
@@ -83,6 +81,7 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		System.out.println("============================================");
 		System.out.println("File opened: " + openAction.getOpenedFile().getProjectRelativePath());
 		System.out.println("In same package: " + openAction.openedInSamePackage() + ", in same project: " + openAction.openedInSameProject() + ", same file type: " + openAction.isTheSameTypeAsPreviuos());
+		logCommonParams(action);
 		System.out.println("============================================");
 	}
 	
@@ -91,6 +90,7 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		System.out.println("============================================");
 		System.out.println("File opened: " + switchAction.getOpenedFile().getProjectRelativePath());
 		System.out.println("In same package: " + switchAction.openedInSamePackage() + ", in same project: " + switchAction.openedInSameProject() + ", same file type: " + switchAction.isTheSameTypeAsPreviuos());
+		logCommonParams(action);
 		System.out.println("============================================");
 	}
 	
@@ -99,6 +99,7 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		System.out.println("============================================");
 		System.out.println("File added: " + openAction.getAddedFile().getProjectRelativePath());
 		System.out.println("In same package: " + openAction.isSamePackage() + ", in same project: " + openAction.isSameProject());
+		logCommonParams(action);
 		System.out.println("============================================");
 	}
 	
@@ -106,6 +107,7 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		RefactorFileAction fileAction = (RefactorFileAction) action;
 		System.out.println("============================================");
 		System.out.println("File refactored, old:" + fileAction.getOldFilePath() + ", new: " + fileAction.getNewFilePath());
+		logCommonParams(action);
 		System.out.println("============================================");
 	}
 	
@@ -113,13 +115,7 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		RefactorPackageAction packageAction = (RefactorPackageAction) action;
 		System.out.println("============================================");
 		System.out.println("Package refactored, old:" + packageAction.getOldFilePath() + ", new: " + packageAction.getNewFilePath());
-		System.out.println("============================================");
-	}
-	
-	private void logSavedFileAction(EclipseAction action) {
-		SaveFileAction saveAction = (SaveFileAction) action;
-		System.out.println("============================================");
-		System.out.println("File saved: " + saveAction.getFile().getProjectRelativePath());
+		logCommonParams(action);
 		System.out.println("============================================");
 	}
 	
@@ -129,6 +125,7 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		System.out.println("Package added: " + addAction.getAddedPackage().getProjectRelativePath());
 		System.out.println("Is in same package: " + addAction.isSamePackage());
 		System.out.println("Is in same project: " + addAction.isSameProject());
+		logCommonParams(action);
 		System.out.println("============================================");
 	}
 	
@@ -138,9 +135,13 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 		System.out.println("Package deleted: " + deleteAction.getAddedPackage().getProjectRelativePath());
 		System.out.println("Is in same package: " + deleteAction.isSamePackage());
 		System.out.println("Is in same project: " + deleteAction.isSameProject());
+		logCommonParams(action);
 		System.out.println("============================================");
 	}
 	
+	private void logCommonParams(EclipseAction action) {
+		System.out.println("Last action: " + action.getActionType() + ", time since last action: " + action.getTimeSinceLastAction() + " ms");
+	}
 	
 
 }

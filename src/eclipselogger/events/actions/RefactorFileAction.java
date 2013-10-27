@@ -13,7 +13,8 @@ public class RefactorFileAction extends EclipseAction {
 	
 	// TODO implement type of refactoring
 	
-	public RefactorFileAction(IFile oldFile, IFile newFile) {
+	public RefactorFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile oldFile, IFile newFile) {
+		super(timeSinceLastAction, previousAction);
 		this.oldFilePath = oldFile.getProjectRelativePath().toOSString();
 		this.newFilePath = newFile.getProjectRelativePath().toOSString();
 		this.refactorType = resolveRefactorType(oldFile, newFile);
@@ -40,6 +41,11 @@ public class RefactorFileAction extends EclipseAction {
 		} else {
 			return FILE_RENAME;
 		}
+	}
+
+	@Override
+	public ActionType getActionType() {
+		return ActionType.REFATOR_FILE;
 	}
 	
 	

@@ -11,7 +11,8 @@ public class AddPackageAction extends EclipseAction {
 	private boolean samePackage;
 	private boolean sameProject;
 	
-	public AddPackageAction(IFolder addedPackage, IFile previousFile) {
+	public AddPackageAction(long timeSinceLastAction, EclipseAction previousAction, IFolder addedPackage, IFile previousFile) {
+		super(timeSinceLastAction, previousAction);
 		this.addedPackage = addedPackage;
 		this.previousFile = previousFile;
 		samePackage = PackageUtils.checkIfSamePackage(addedPackage, previousFile);
@@ -32,6 +33,11 @@ public class AddPackageAction extends EclipseAction {
 
 	public boolean isSameProject() {
 		return sameProject;
+	}
+
+	@Override
+	public ActionType getActionType() {
+		return ActionType.ADD_PACKAGE;
 	}
 	
 	

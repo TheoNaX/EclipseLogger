@@ -77,7 +77,8 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 				handleResourceRemoved(resource);
 				break;
 			case IResourceDelta.CHANGED:
-				handleResourceChanged(resource);
+				// We don't handle saved file action any more
+				// handleResourceChanged(resource);
 				break;
 			}
 		}
@@ -104,26 +105,12 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 		if (res.getType() == IResource.FILE) {
 			IFile file = (IFile) res;
 			EclipseActionMonitor.deleteFile(file);
-			//System.out.println("File was removed: " + file.getProjectRelativePath());
 		} else if (res.getType() == IResource.FOLDER) {
 			IFolder folder = (IFolder) res;
 			EclipseActionMonitor.deleteFolder(folder);
-			//System.out.println("Folder / package was removed: " + folder.getProjectRelativePath());
-		} else if (res.getType() == IResource.PROJECT) {
-			IProject project = (IProject) res;
-			EclipseActionMonitor.deleteProject(project);
-			System.out.println("Project was removed: " + project.getName());
 		}
 	}
-	
-	private void handleResourceChanged(IResource res) {
-		if (res.getType() == IResource.FILE) {
-			IFile file = (IFile) res;
-			EclipseActionMonitor.fileChanged(file);
-			//System.out.println("File was changed: " + file.getProjectRelativePath());
-		} 
-	}
-	
+
 	@Override
 	public boolean visit(IResourceDelta delta) throws CoreException {
 		IResource res = delta.getResource();

@@ -15,12 +15,10 @@ import eclipselogger.events.actions.AddProjectAction;
 import eclipselogger.events.actions.CloseFileAction;
 import eclipselogger.events.actions.DeleteFileAction;
 import eclipselogger.events.actions.DeletePackageAction;
-import eclipselogger.events.actions.DeleteProjectAction;
 import eclipselogger.events.actions.EclipseAction;
 import eclipselogger.events.actions.OpenNewFileAction;
 import eclipselogger.events.actions.RefactorFileAction;
 import eclipselogger.events.actions.RefactorPackageAction;
-import eclipselogger.events.actions.SaveFileAction;
 import eclipselogger.events.actions.SwitchToFileAction;
 import eclipselogger.logging.ConsoleActionLogger;
 import eclipselogger.logging.EclipseActiontLogIF;
@@ -33,7 +31,9 @@ public class EclipseActionMonitor {
 	private static IFile actualFile;
 	private static IFile previousFile;
 	private static IProject actualProject;
-	private static long fileWorkStart; 
+	private static long fileWorkStart;
+	private static EclipseAction lastAction;
+	private static long lastActionTime;
 	
 	// logger
 	private static EclipseActiontLogIF logger = new ConsoleActionLogger();
@@ -118,45 +118,63 @@ public class EclipseActionMonitor {
 		} else {
 			previous = getActualFile();
 		}
-		CloseFileAction closeAction = new CloseFileAction(file, previous, closed);
+		
+		long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
+		CloseFileAction closeAction = new CloseFileAction(timeSinceLastAction, lastAction, file, previous, closed);
 		logger.logEclipseAction(closeAction);
+		afterAction(closeAction);
 	}
 	
 	public static void openNewFile(IFile file) {
 		setActualFile(file);
-		OpenNewFileAction openAction = new OpenNewFileAction(file, previousFile);
+		
+		long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
+		OpenNewFileAction openAction = new OpenNewFileAction(timeSinceLastAction, lastAction, file, previousFile);
 		logger.logEclipseAction(openAction);
 	}
 	
 	public static void switchToFile(IFile file) {
 		setActualFile(file);
-		SwitchToFileAction switchAction = new SwitchToFileAction(file, previousFile);
+		
+		long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
+		SwitchToFileAction switchAction = new SwitchToFileAction(timeSinceLastAction, lastAction, file, previousFile);
 		logger.logEclipseAction(switchAction);
+		afterAction(switchAction);
 	}
 	
 	public static void refactorPackage(IFolder oldPack, IFolder newPack) {
-		RefactorPackageAction refPackAction = new RefactorPackageAction(oldPack.getProjectRelativePath().toOSString(), newPack.getProjectRelativePath().toOSString());
+		long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
+		RefactorPackageAction refPackAction = new RefactorPackageAction(timeSinceLastAction, lastAction, oldPack, newPack);
 		logger.logEclipseAction(refPackAction);
+		afterAction(refPackAction);
 	}
 	
 	public static void refactorFile(IFile oldFile, IFile newFile) {
-		RefactorFileAction refFileAction = new RefactorFileAction(oldFile, newFile);
+		long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
+		RefactorFileAction refFileAction = new RefactorFileAction(timeSinceLastAction, lastAction, oldFile, newFile);
 		logger.logEclipseAction(refFileAction);
+		afterAction(refFileAction);
 	}
 	
 	public static void addFolder(IFolder folder) {
-		AddPackageAction action = new AddPackageAction(folder, actualFile);
+		long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
+		AddPackageAction action = new AddPackageAction(timeSinceLastAction, lastAction, folder, actualFile);
 		logger.logEclipseAction(action);
+		afterAction(action);
 	}
 	
 	public static void deleteFolder(IFolder folder) {
-		DeletePackageAction action = new DeletePackageAction(folder, actualFile);
+		long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
+		DeletePackageAction action = new DeletePackageAction(timeSinceLastAction, lastAction, folder, actualFile);
 		logger.logEclipseAction(action);
+		afterAction(action);
 	}
 	
 	public static void addFile(IFile file) {
-		AddFileAction action = new AddFileAction(file, actualFile);
+		long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
+		AddFileAction action = new AddFileAction(timeSinceLastAction, lastAction, file, actualFile);
 		logger.logEclipseAction(action);
+		afterAction(action);
 	}
 	
 	public static void deleteFile(IFile file) {
@@ -166,30 +184,25 @@ public class EclipseActionMonitor {
 		} else {
 			previous = actualFile;
 		}
+		long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
 		WorkingFile deleted = workingFiles.remove(file.getProjectRelativePath().toOSString());
-		DeleteFileAction deleteFile = new DeleteFileAction(file, previous, deleted);
-		logger.logEclipseAction(deleteFile);
+		DeleteFileAction deleteFileAction = new DeleteFileAction(timeSinceLastAction, lastAction, file, previous, deleted);
+		logger.logEclipseAction(deleteFileAction);
+		afterAction(deleteFileAction);
 	}
 	
-	public static void fileChanged(IFile file) {
-		if (file.equals(actualFile)) {
-			WorkingFile saved = workingFiles.get(file.getProjectRelativePath().toOSString());
-			SaveFileAction saveAction = new SaveFileAction(file, saved);
-			logger.logEclipseAction(saveAction);
-		}
-	}
 
 	public static void addProject(IProject project) {
-		AddProjectAction action = new AddProjectAction(project);
+		long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
+		AddProjectAction action = new AddProjectAction(timeSinceLastAction, lastAction, project);
 		logger.logEclipseAction(action);
-	}
-
-	public static void deleteProject(IProject project) {
-		DeleteProjectAction action = new DeleteProjectAction(project);
-		logger.logEclipseAction(action);
+		afterAction(action);
 	}
 	
-	
+	private static void afterAction(EclipseAction action) {
+		lastAction = action;
+		lastActionTime = System.currentTimeMillis();
+	}
 	
 	
 }

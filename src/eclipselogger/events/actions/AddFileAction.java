@@ -10,7 +10,8 @@ public class AddFileAction extends EclipseAction {
 	private boolean samePackage;
 	private boolean sameProject;
 	
-	public AddFileAction(IFile addedFile, IFile previousFile) {
+	public AddFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile addedFile, IFile previousFile) {
+		super(timeSinceLastAction, previousAction);
 		this.addedFile = addedFile;
 		this.previousFile = previousFile;
 		samePackage = PackageUtils.checkIfSamePackage(addedFile, previousFile);
@@ -31,5 +32,10 @@ public class AddFileAction extends EclipseAction {
 
 	public boolean isSameProject() {
 		return sameProject;
+	}
+
+	@Override
+	public ActionType getActionType() {
+		return ActionType.ADD_FILE;
 	}
 }

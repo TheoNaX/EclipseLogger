@@ -13,7 +13,8 @@ public class SwitchToFileAction extends EclipseAction {
 	private boolean sameFileType;
 	
 	
-	public SwitchToFileAction(IFile openedFile, IFile previousFile) {
+	public SwitchToFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile openedFile, IFile previousFile) {
+		super(timeSinceLastAction, previousAction);
 		this.openedFile = openedFile;
 		this.previousFile = previousFile;
 		samePackage = PackageUtils.checkIfSamePackage(openedFile, previousFile);
@@ -44,6 +45,11 @@ public class SwitchToFileAction extends EclipseAction {
 	
 	public boolean isTheSameTypeAsPreviuos() {
 		return this.sameFileType;
+	}
+	
+	@Override
+	public ActionType getActionType() {
+		return ActionType.SWITCH_FILE;
 	}
 	
 }

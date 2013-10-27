@@ -1,5 +1,7 @@
 package eclipselogger.events.actions;
 
+import org.eclipse.core.resources.IFolder;
+
 public class RefactorPackageAction extends EclipseAction {
 	
 	public static final String PACKAGE_RENAME = "PACKAGE_RENAME";
@@ -9,9 +11,11 @@ public class RefactorPackageAction extends EclipseAction {
 	private String newPackagePath;
 	private String refactorType;
 	
-	public RefactorPackageAction(String oldPackagePath, String newPackagePath) {
-		this.oldPackagePath = oldPackagePath;
-		this.newPackagePath = newPackagePath;
+	public RefactorPackageAction(long timeSinceLastAction, EclipseAction previousAction, IFolder oldPackage, IFolder newPackage) {
+		super(timeSinceLastAction, previousAction);
+		this.oldPackagePath = oldPackage.getProjectRelativePath().toOSString();
+		this.newPackagePath = newPackage.getProjectRelativePath().toOSString();
+		refactorType = resolveRefactorType(oldPackage, newPackage);
 	}
 
 	public String getOldFilePath() {
@@ -24,6 +28,22 @@ public class RefactorPackageAction extends EclipseAction {
 
 	public String getRefactorType() {
 		return refactorType;
+	}
+	
+	private static String resolveRefactorType(IFolder oldFolder, IFolder newFolder) {
+		if (oldFolder == null || newFolder == null) {
+			return null;
+		}
+		if (oldFolder.getName().equals(newFolder.getName())) {
+			return PACKAGE_MOVE;
+		} else {
+			return PACKAGE_RENAME;
+		}
+	}
+
+	@Override
+	public ActionType getActionType() {
+		return ActionType.REFACTOR_PACKAGE;
 	}
 	
 

@@ -17,7 +17,8 @@ public class DeleteFileAction extends EclipseAction {
 	
 	// TODO implement count of deleted files within some period ???
 	
-	public DeleteFileAction(IFile deletedFile, IFile previoiusFile, WorkingFile workFile) {
+	public DeleteFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile deletedFile, IFile previoiusFile, WorkingFile workFile) {
+		super(timeSinceLastAction, previousAction);
 		this.deletedFile = deletedFile;
 		this.previousFile = previoiusFile;
 		this.workFile = workFile;
@@ -48,6 +49,11 @@ public class DeleteFileAction extends EclipseAction {
 	
 	public WorkingFile getWorkingFile() {
 		return this.workFile;
+	}
+
+	@Override
+	public ActionType getActionType() {
+		return ActionType.DELETE_FILE;
 	}
 	
 	

@@ -1,0 +1,14 @@
+package eclipselogger.events.actions;
+
+public enum ActionType {
+	ADD_FILE,
+	ADD_PACKAGE,
+	ADD_PROJECT,
+	CLOSE_FILE,
+	DELETE_FILE,
+	DELETE_PACKAGE,
+	OPEN_FILE,
+	REFATOR_FILE,
+	REFACTOR_PACKAGE,
+	SWITCH_FILE
+}

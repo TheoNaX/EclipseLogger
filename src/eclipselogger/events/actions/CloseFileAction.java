@@ -14,7 +14,8 @@ public class CloseFileAction extends EclipseAction {
 	private boolean sameFileType;
 	private WorkingFile workFile;
 	
-	public CloseFileAction(IFile closedFile, IFile previousFile, WorkingFile workFile) {
+	public CloseFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile closedFile, IFile previousFile, WorkingFile workFile) {
+		super(timeSinceLastAction, previousAction);
 		this.closedFile = closedFile;
 		this.previousFile = previousFile;
 		samePackage = PackageUtils.checkIfSamePackage(closedFile, previousFile);
@@ -50,5 +51,10 @@ public class CloseFileAction extends EclipseAction {
 	
 	public WorkingFile getWorkingFile() {
 		return this.workFile;
+	}
+
+	@Override
+	public ActionType getActionType() {
+		return ActionType.CLOSE_FILE;
 	}
 }

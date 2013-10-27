@@ -14,7 +14,8 @@ public class DeletePackageAction extends EclipseAction {
 	
 	// TODO implement number of files in package
 	
-	public DeletePackageAction(IFolder deletedPackage, IFile previousFile) {
+	public DeletePackageAction(long timeSinceLastAction, EclipseAction previousAction, IFolder deletedPackage, IFile previousFile) {
+		super(timeSinceLastAction, previousAction);
 		this.deletedPackage = deletedPackage;
 		this.previousFile = previousFile;
 		samePackage = PackageUtils.checkIfSamePackage(deletedPackage, previousFile);
@@ -35,5 +36,10 @@ public class DeletePackageAction extends EclipseAction {
 
 	public boolean isSameProject() {
 		return sameProject;
+	}
+
+	@Override
+	public ActionType getActionType() {
+		return ActionType.DELETE_PACKAGE;
 	}
 }

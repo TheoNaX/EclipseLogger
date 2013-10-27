@@ -12,7 +12,8 @@ public class OpenNewFileAction extends EclipseAction {
 	private boolean sameProject;
 	private boolean sameFileType;
 	
-	public OpenNewFileAction(IFile openedFile, IFile previousFile) {
+	public OpenNewFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile openedFile, IFile previousFile) {
+		super(timeSinceLastAction, previousAction);
 		this.openedFile = openedFile;
 		this.previousFile = previousFile;
 		samePackage = PackageUtils.checkIfSamePackage(openedFile, previousFile);
@@ -43,6 +44,11 @@ public class OpenNewFileAction extends EclipseAction {
 	
 	public boolean isTheSameTypeAsPreviuos() {
 		return this.sameFileType;
+	}
+
+	@Override
+	public ActionType getActionType() {
+		return ActionType.OPEN_FILE;
 	}
 	
 	
