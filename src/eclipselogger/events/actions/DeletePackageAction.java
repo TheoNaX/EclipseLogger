@@ -6,6 +6,9 @@ import org.eclipse.core.resources.IFolder;
 import eclipselogger.utils.PackageUtils;
 
 public class DeletePackageAction extends EclipseAction {
+	
+	public static final String TABLE_NAME = "delete_package";
+	
 	private IFile previousFile;
 	private IFolder deletedPackage;
 	private boolean samePackage;

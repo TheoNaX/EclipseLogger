@@ -6,7 +6,10 @@ import eclipselogger.utils.FileValidator;
 import eclipselogger.utils.PackageUtils;
 
 public class SwitchToFileAction extends EclipseAction {
-	private IFile openedFile;
+	
+	public static final String TABLE_NAME = "add_file";
+	
+	private IFile switchedToFile;
 	private IFile previousFile;
 	private boolean samePackage;
 	private boolean sameProject;
@@ -15,7 +18,7 @@ public class SwitchToFileAction extends EclipseAction {
 	
 	public SwitchToFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile openedFile, IFile previousFile) {
 		super(timeSinceLastAction, previousAction);
-		this.openedFile = openedFile;
+		this.switchedToFile = openedFile;
 		this.previousFile = previousFile;
 		samePackage = PackageUtils.checkIfSamePackage(openedFile, previousFile);
 		sameProject = PackageUtils.checkIfSameProject(openedFile, previousFile);
@@ -31,8 +34,8 @@ public class SwitchToFileAction extends EclipseAction {
 		return 0;
 	}
 	
-	public IFile getOpenedFile() {
-		return this.openedFile;
+	public IFile getSwitchedToFile() {
+		return this.switchedToFile;
 	}
 	
 	public IFile getPreviousOpenedFile() {

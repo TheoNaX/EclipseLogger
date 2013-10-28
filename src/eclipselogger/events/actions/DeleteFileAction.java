@@ -8,6 +8,9 @@ import eclipselogger.utils.PackageUtils;
 
 
 public class DeleteFileAction extends EclipseAction {
+	
+	public static final String TABLE_NAME = "delete_file";
+	
 	private IFile deletedFile;
 	private IFile previousFile;
 	private boolean samePackage;

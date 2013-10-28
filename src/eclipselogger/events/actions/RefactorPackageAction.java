@@ -4,6 +4,8 @@ import org.eclipse.core.resources.IFolder;
 
 public class RefactorPackageAction extends EclipseAction {
 	
+	public static final String TABLE_NAME = "refactor_package";
+	
 	public static final String PACKAGE_RENAME = "PACKAGE_RENAME";
 	public static final String PACKAGE_MOVE = "PACKAGE_MOVE";
 	

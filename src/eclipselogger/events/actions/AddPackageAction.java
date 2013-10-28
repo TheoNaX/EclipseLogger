@@ -6,6 +6,9 @@ import org.eclipse.core.resources.IFolder;
 import eclipselogger.utils.PackageUtils;
 
 public class AddPackageAction extends EclipseAction {
+	
+	public static final String TABLE_NAME = "add_package";
+	
 	private IFile previousFile;
 	private IFolder addedPackage;
 	private boolean samePackage;

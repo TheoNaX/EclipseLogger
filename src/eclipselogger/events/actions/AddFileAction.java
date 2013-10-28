@@ -6,11 +6,15 @@ import eclipselogger.utils.FileValidator;
 import eclipselogger.utils.PackageUtils;
 
 public class AddFileAction extends EclipseAction {
+	
+	public static final String TABLE_NAME = "add_file";
+	
 	private IFile previousFile;
 	private IFile addedFile;
 	private boolean samePackage;
 	private boolean sameProject;
 	private boolean sameFileType;
+	
 	
 	public AddFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile addedFile, IFile previousFile) {
 		super(timeSinceLastAction, previousAction);

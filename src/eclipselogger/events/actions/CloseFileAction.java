@@ -7,6 +7,9 @@ import eclipselogger.utils.FileValidator;
 import eclipselogger.utils.PackageUtils;
 
 public class CloseFileAction extends EclipseAction {
+	
+	public static final String TABLE_NAME = "close_file";
+	
 	private IFile closedFile;
 	private IFile previousFile;
 	private boolean samePackage;

@@ -4,6 +4,8 @@ import org.eclipse.core.resources.IFile;
 
 public class RefactorFileAction extends EclipseAction {
 	
+	public static final String TABLE_NAME = "refactor_file";
+	
 	public static final String FILE_RENAME = "FILE_RENAME";
 	public static final String FILE_MOVE = "FILE_MOVE";
 	
@@ -46,7 +48,7 @@ public class RefactorFileAction extends EclipseAction {
 
 	@Override
 	public ActionType getActionType() {
-		return ActionType.REFATOR_FILE;
+		return ActionType.REFACTOR_FILE;
 	}
 	
 	

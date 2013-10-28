@@ -88,7 +88,7 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 	private void logSwitchToFileAction(EclipseAction action) {
 		SwitchToFileAction switchAction = (SwitchToFileAction) action;
 		System.out.println("============================================");
-		System.out.println("File switched: " + switchAction.getOpenedFile().getProjectRelativePath());
+		System.out.println("File switched: " + switchAction.getSwitchedToFile().getProjectRelativePath());
 		System.out.println("In same package: " + switchAction.openedInSamePackage() + ", in same project: " + switchAction.openedInSameProject() + ", same file type: " + switchAction.isTheSameTypeAsPreviuos());
 		logCommonParams(action);
 		System.out.println("============================================");

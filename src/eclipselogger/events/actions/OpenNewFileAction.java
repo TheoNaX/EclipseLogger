@@ -6,6 +6,9 @@ import eclipselogger.utils.FileValidator;
 import eclipselogger.utils.PackageUtils;
 
 public class OpenNewFileAction extends EclipseAction {
+	
+	public static final String TABLE_NAME = "open_file";
+	
 	private IFile openedFile;
 	private IFile previousFile;
 	private boolean samePackage;
