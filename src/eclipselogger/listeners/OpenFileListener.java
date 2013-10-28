@@ -23,7 +23,6 @@ public class OpenFileListener implements IPartListener2 {
 			if (input instanceof IFileEditorInput) {
 				IFile file = ((IFileEditorInput)input).getFile();
 				if (lastOpened == null || !lastOpened.equals(file.getProjectRelativePath().toOSString())) {
-					System.out.println("Switched to file: " + file.getProjectRelativePath());
 					EclipseActionMonitor.switchToFile(file);
 				}
 			}
