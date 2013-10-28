@@ -11,7 +11,8 @@ public class RefactorFileAction extends EclipseAction {
 	private String newFilePath;
 	private String refactorType;
 	
-	// TODO implement type of refactoring
+	// TODO same package + same project 
+	
 	
 	public RefactorFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile oldFile, IFile newFile) {
 		super(timeSinceLastAction, previousAction);
