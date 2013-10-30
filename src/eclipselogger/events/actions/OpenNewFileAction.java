@@ -9,23 +9,23 @@ public class OpenNewFileAction extends EclipseAction {
 	
 	public static final String TABLE_NAME = "open_file";
 	
-	private IFile openedFile;
-	private IFile previousFile;
-	private boolean samePackage;
-	private boolean sameProject;
-	private boolean sameFileType;
+	private final String openedFile;
+	private final String previousFile;
+	private final boolean samePackage;
+	private final boolean sameProject;
+	private final boolean sameFileType;
 	
-	public OpenNewFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile openedFile, IFile previousFile) {
+	public OpenNewFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile openedFile, final IFile previousFile) {
 		super(timeSinceLastAction, previousAction);
-		this.openedFile = openedFile;
-		this.previousFile = previousFile;
-		samePackage = PackageUtils.checkIfSamePackage(openedFile, previousFile);
-		sameProject = PackageUtils.checkIfSameProject(openedFile, previousFile);
-		sameFileType = FileValidator.haveFilesTheSameExtension(openedFile, previousFile);
+		this.openedFile = openedFile.getProjectRelativePath().toOSString();
+		this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		this.samePackage = PackageUtils.checkIfSamePackage(openedFile, previousFile);
+		this.sameProject = PackageUtils.checkIfSameProject(openedFile, previousFile);
+		this.sameFileType = FileValidator.haveFilesTheSameExtension(openedFile, previousFile);
 	}
 	
 	public boolean openedInSamePackage() {
-		return samePackage;
+		return this.samePackage;
 	}
 	
 	public int getPackageDistance() {
@@ -33,11 +33,11 @@ public class OpenNewFileAction extends EclipseAction {
 		return 0;
 	}
 	
-	public IFile getOpenedFile() {
+	public String getOpenedFile() {
 		return this.openedFile;
 	}
 	
-	public IFile getPreviousOpenedFile() {
+	public String getPreviousOpenedFile() {
 		return this.previousFile;
 	}
 	

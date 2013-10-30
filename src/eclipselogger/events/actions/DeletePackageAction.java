@@ -9,36 +9,33 @@ public class DeletePackageAction extends EclipseAction {
 	
 	public static final String TABLE_NAME = "delete_package";
 	
-	private IFile previousFile;
-	private IFolder deletedPackage;
-	private boolean samePackage;
-	private boolean sameProject;
-	private int filesCount;
+	private final String previousFile;
+	private final String deletedPackage;
+	private final boolean samePackage;
+	private final boolean sameProject;	
 	
-	// TODO implement number of files in package
-	
-	public DeletePackageAction(long timeSinceLastAction, EclipseAction previousAction, IFolder deletedPackage, IFile previousFile) {
+	public DeletePackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFolder deletedPackage, final IFile previousFile) {
 		super(timeSinceLastAction, previousAction);
-		this.deletedPackage = deletedPackage;
-		this.previousFile = previousFile;
-		samePackage = PackageUtils.checkIfSamePackage(deletedPackage, previousFile);
-		sameProject = PackageUtils.checkIfSameProject(deletedPackage, previousFile);
+		this.deletedPackage = deletedPackage.getProjectRelativePath().toOSString();
+		this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		this.samePackage = PackageUtils.checkIfSamePackage(deletedPackage, previousFile);
+		this.sameProject = PackageUtils.checkIfSameProject(deletedPackage, previousFile);
 	}
 
-	public IFile getPreviousFile() {
-		return previousFile;
+	public String getPreviousFile() {
+		return this.previousFile;
 	}
 
-	public IFolder getAddedPackage() {
-		return deletedPackage;
+	public String getDeletedPackage() {
+		return this.deletedPackage;
 	}
 
 	public boolean isSamePackage() {
-		return samePackage;
+		return this.samePackage;
 	}
 
 	public boolean isSameProject() {
-		return sameProject;
+		return this.sameProject;
 	}
 
 	@Override

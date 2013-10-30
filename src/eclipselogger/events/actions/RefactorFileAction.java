@@ -9,14 +9,18 @@ public class RefactorFileAction extends EclipseAction {
 	public static final String FILE_RENAME = "FILE_RENAME";
 	public static final String FILE_MOVE = "FILE_MOVE";
 	
-	private String oldFilePath;
-	private String newFilePath;
-	private String refactorType;
+	private final String oldFilePath;
+	private final String newFilePath;
+	private final String refactorType;
+	private boolean samePackage;
+	private boolean sameProject;
+	private String previousFile;
+	private String refactoredFile;
 	
 	// TODO same package + same project 
 	
 	
-	public RefactorFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile oldFile, IFile newFile) {
+	public RefactorFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile oldFile, final IFile newFile) {
 		super(timeSinceLastAction, previousAction);
 		this.oldFilePath = oldFile.getProjectRelativePath().toOSString();
 		this.newFilePath = newFile.getProjectRelativePath().toOSString();
@@ -24,18 +28,18 @@ public class RefactorFileAction extends EclipseAction {
 	}
 
 	public String getOldFilePath() {
-		return oldFilePath;
+		return this.oldFilePath;
 	}
 
 	public String getNewFilePath() {
-		return newFilePath;
+		return this.newFilePath;
 	}
 
 	public String getRefactorType() {
-		return refactorType;
+		return this.refactorType;
 	}
 	
-	private static String resolveRefactorType(IFile oldFile, IFile newFile) {
+	private static String resolveRefactorType(final IFile oldFile, final IFile newFile) {
 		if (oldFile == null || newFile == null) {
 			return null;
 		}
@@ -44,6 +48,22 @@ public class RefactorFileAction extends EclipseAction {
 		} else {
 			return FILE_RENAME;
 		}
+	}
+	
+	public boolean isSamePackage() {
+		return this.samePackage;
+	}
+
+	public boolean isSameProject() {
+		return this.sameProject;
+	}
+
+	public String getPreviousFile() {
+		return this.previousFile;
+	}
+	
+	public String getRefactoredFile() {
+		return this.refactoredFile;
 	}
 
 	@Override

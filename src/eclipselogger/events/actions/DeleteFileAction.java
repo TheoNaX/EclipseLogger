@@ -3,6 +3,7 @@ package eclipselogger.events.actions;
 import org.eclipse.core.resources.IFile;
 
 import eclipselogger.events.WorkingFile;
+import eclipselogger.utils.FileChanges;
 import eclipselogger.utils.FileValidator;
 import eclipselogger.utils.PackageUtils;
 
@@ -11,47 +12,55 @@ public class DeleteFileAction extends EclipseAction {
 	
 	public static final String TABLE_NAME = "delete_file";
 	
-	private IFile deletedFile;
-	private IFile previousFile;
-	private boolean samePackage;
-	private boolean sameProject;
-	private boolean sameFileType;
-	private WorkingFile workFile;
+	private final String deletedFile;
+	private final String previousFile;
+	private final boolean samePackage;
+	private final boolean sameProject;
+	private final boolean sameFileType;
+	private FileChanges changes;
+	private long workingTime;
 	
 	// TODO implement count of deleted files within some period ???
 	
-	public DeleteFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile deletedFile, IFile previoiusFile, WorkingFile workFile) {
+	public DeleteFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile deletedFile, final IFile previoiusFile, final WorkingFile workFile) {
 		super(timeSinceLastAction, previousAction);
-		this.deletedFile = deletedFile;
-		this.previousFile = previoiusFile;
-		this.workFile = workFile;
-		samePackage = PackageUtils.checkIfSamePackage(deletedFile, previoiusFile);
-		sameProject = PackageUtils.checkIfSameProject(deletedFile, previoiusFile);
-		sameFileType = FileValidator.haveFilesTheSameExtension(deletedFile, previoiusFile);
+		this.deletedFile = deletedFile.getProjectRelativePath().toOSString();
+		this.previousFile = previoiusFile.getProjectRelativePath().toOSString();
+		this.samePackage = PackageUtils.checkIfSamePackage(deletedFile, previoiusFile);
+		this.sameProject = PackageUtils.checkIfSameProject(deletedFile, previoiusFile);
+		this.sameFileType = FileValidator.haveFilesTheSameExtension(deletedFile, previoiusFile);
+		if (workFile != null) {
+			this.changes = workFile.getFileChanges();
+			this.workingTime = workFile.getWorkingTime();
+		}
 	}
 
-	public IFile getDeletedFile() {
-		return deletedFile;
+	public String getDeletedFile() {
+		return this.deletedFile;
 	}
 
-	public IFile getPreviousFile() {
-		return previousFile;
+	public String getPreviousFile() {
+		return this.previousFile;
 	}
 
 	public boolean isSamePackage() {
-		return samePackage;
+		return this.samePackage;
 	}
 
 	public boolean isSameProject() {
-		return sameProject;
+		return this.sameProject;
 	}
 
 	public boolean isSameFileType() {
-		return sameFileType;
+		return this.sameFileType;
 	}
 	
-	public WorkingFile getWorkingFile() {
-		return this.workFile;
+	public FileChanges getFileChanges() {
+		return this.changes;
+	}
+	
+	public long getFileWorkingTime() {
+		return this.workingTime;
 	}
 
 	@Override

@@ -9,33 +9,33 @@ public class AddPackageAction extends EclipseAction {
 	
 	public static final String TABLE_NAME = "add_package";
 	
-	private IFile previousFile;
-	private IFolder addedPackage;
-	private boolean samePackage;
-	private boolean sameProject;
+	private final String previousFile;
+	private final String addedPackage;
+	private final boolean samePackage;
+	private final boolean sameProject;
 	
-	public AddPackageAction(long timeSinceLastAction, EclipseAction previousAction, IFolder addedPackage, IFile previousFile) {
+	public AddPackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFolder addedPackage, final IFile previousFile) {
 		super(timeSinceLastAction, previousAction);
-		this.addedPackage = addedPackage;
-		this.previousFile = previousFile;
-		samePackage = PackageUtils.checkIfSamePackage(addedPackage, previousFile);
-		sameProject = PackageUtils.checkIfSameProject(addedPackage, previousFile);
+		this.addedPackage = addedPackage.getProjectRelativePath().toOSString();
+		this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		this.samePackage = PackageUtils.checkIfSamePackage(addedPackage, previousFile);
+		this.sameProject = PackageUtils.checkIfSameProject(addedPackage, previousFile);
 	}
 
-	public IFile getPreviousFile() {
-		return previousFile;
+	public String getPreviousFile() {
+		return this.previousFile;
 	}
 
-	public IFolder getAddedPackage() {
-		return addedPackage;
+	public String getAddedPackage() {
+		return this.addedPackage;
 	}
 
 	public boolean isSamePackage() {
-		return samePackage;
+		return this.samePackage;
 	}
 
 	public boolean isSameProject() {
-		return sameProject;
+		return this.sameProject;
 	}
 
 	@Override

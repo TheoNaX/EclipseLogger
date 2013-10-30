@@ -6,15 +6,21 @@ public class AddProjectAction extends EclipseAction {
 	
 	public static final String TABLE_NAME = "add_project";
 	
-	private IProject project;
+	private final IProject project;
+	private final String projectName;
 	
-	public AddProjectAction(long timeSinceLastAction, EclipseAction previousAction, IProject project) {
+	public AddProjectAction(final long timeSinceLastAction, final EclipseAction previousAction, final IProject project) {
 		super(timeSinceLastAction, previousAction);
 		this.project = project;
+		this.projectName = project.getName();
 	}
 	
 	public IProject getProject() {
 		return this.project;
+	}
+	
+	public String getProjectName() {
+		return this.projectName;
 	}
 
 	@Override

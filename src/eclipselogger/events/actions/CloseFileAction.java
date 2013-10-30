@@ -3,6 +3,7 @@ package eclipselogger.events.actions;
 import org.eclipse.core.resources.IFile;
 
 import eclipselogger.events.WorkingFile;
+import eclipselogger.utils.FileChanges;
 import eclipselogger.utils.FileValidator;
 import eclipselogger.utils.PackageUtils;
 
@@ -10,25 +11,29 @@ public class CloseFileAction extends EclipseAction {
 	
 	public static final String TABLE_NAME = "close_file";
 	
-	private IFile closedFile;
-	private IFile previousFile;
-	private boolean samePackage;
-	private boolean sameProject;
-	private boolean sameFileType;
-	private WorkingFile workFile;
+	private final String closedFile;
+	private final String previousFile;
+	private final boolean samePackage;
+	private final boolean sameProject;
+	private final boolean sameFileType;
+	private FileChanges fileChanges;
+	private long workingTime;
 	
-	public CloseFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile closedFile, IFile previousFile, WorkingFile workFile) {
+	public CloseFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile closedFile, final IFile previousFile, final WorkingFile workFile) {
 		super(timeSinceLastAction, previousAction);
-		this.closedFile = closedFile;
-		this.previousFile = previousFile;
-		samePackage = PackageUtils.checkIfSamePackage(closedFile, previousFile);
-		sameProject = PackageUtils.checkIfSameProject(closedFile, previousFile);
-		sameFileType = FileValidator.haveFilesTheSameExtension(closedFile, previousFile);
-		this.workFile = workFile;
+		this.closedFile = closedFile.getProjectRelativePath().toOSString();
+		this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		this.samePackage = PackageUtils.checkIfSamePackage(closedFile, previousFile);
+		this.sameProject = PackageUtils.checkIfSameProject(closedFile, previousFile);
+		this.sameFileType = FileValidator.haveFilesTheSameExtension(closedFile, previousFile);
+		if (workFile != null) {
+			this.fileChanges = workFile.getFileChanges();
+			this.workingTime = workFile.getWorkingTime();
+		}
 	}
 	
 	public boolean closedInSamePackage() {
-		return samePackage;
+		return this.samePackage;
 	}
 	
 	public int getPackageDistance() {
@@ -36,11 +41,11 @@ public class CloseFileAction extends EclipseAction {
 		return 0;
 	}
 	
-	public IFile getClosedFile() {
+	public String getClosedFile() {
 		return this.closedFile;
 	}
 	
-	public IFile getPreviousWorkingFile() {
+	public String getPreviousFile() {
 		return this.previousFile;
 	}
 	
@@ -52,8 +57,12 @@ public class CloseFileAction extends EclipseAction {
 		return this.sameFileType;
 	}
 	
-	public WorkingFile getWorkingFile() {
-		return this.workFile;
+	public long getFileWorkingTime() {
+		return this.workingTime;
+	}
+	
+	public FileChanges getFileChanges() {
+		return this.fileChanges;
 	}
 
 	@Override

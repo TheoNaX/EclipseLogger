@@ -1,5 +1,6 @@
 package eclipselogger.events.actions;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 
 public class RefactorPackageAction extends EclipseAction {
@@ -12,7 +13,19 @@ public class RefactorPackageAction extends EclipseAction {
 	private String oldPackagePath;
 	private String newPackagePath;
 	private String refactorType;
+	private boolean samePackage;
+	private boolean sameProject;
+	private String previousFile;
+	private String refactoredPackage;
 	
+	public boolean isSamePackage() {
+		return samePackage;
+	}
+
+	public boolean isSameProject() {
+		return sameProject;
+	}
+
 	public RefactorPackageAction(long timeSinceLastAction, EclipseAction previousAction, IFolder oldPackage, IFolder newPackage) {
 		super(timeSinceLastAction, previousAction);
 		this.oldPackagePath = oldPackage.getProjectRelativePath().toOSString();
@@ -46,6 +59,14 @@ public class RefactorPackageAction extends EclipseAction {
 	@Override
 	public ActionType getActionType() {
 		return ActionType.REFACTOR_PACKAGE;
+	}
+	
+	public String getLastFile() {
+		return this.previousFile;
+	}
+	
+	public String getRefactoredPackage() {
+		return this.refactoredPackage;
 	}
 	
 
