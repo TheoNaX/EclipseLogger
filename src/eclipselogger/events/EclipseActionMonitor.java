@@ -20,7 +20,7 @@ import eclipselogger.events.actions.OpenNewFileAction;
 import eclipselogger.events.actions.RefactorFileAction;
 import eclipselogger.events.actions.RefactorPackageAction;
 import eclipselogger.events.actions.SwitchToFileAction;
-import eclipselogger.logging.ConsoleActionLogger;
+import eclipselogger.logging.DatabaseActionLogger;
 import eclipselogger.logging.EclipseActiontLogIF;
 import eclipselogger.utils.ActualFileContentCache;
 import eclipselogger.utils.FileChanges;
@@ -38,7 +38,8 @@ public class EclipseActionMonitor {
 	private static long lastActionTime;
 	
 	// logger
-	private static EclipseActiontLogIF logger = new ConsoleActionLogger();
+	//private static EclipseActiontLogIF logger = new ConsoleActionLogger();
+	private static EclipseActiontLogIF logger = new DatabaseActionLogger();
 	
 	private static ActualFileContentCache fileContentCache = new ActualFileContentCache(); 
 	
@@ -147,14 +148,14 @@ public class EclipseActionMonitor {
 	
 	public static void refactorPackage(final IFolder oldPack, final IFolder newPack) {
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
-		final RefactorPackageAction refPackAction = new RefactorPackageAction(timeSinceLastAction, lastAction, oldPack, newPack);
+		final RefactorPackageAction refPackAction = new RefactorPackageAction(timeSinceLastAction, lastAction, oldPack, newPack, previousFile);
 		logger.logEclipseAction(refPackAction, DEFAULT_CONTEXT);
 		afterAction(refPackAction);
 	}
 	
 	public static void refactorFile(final IFile oldFile, final IFile newFile) {
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
-		final RefactorFileAction refFileAction = new RefactorFileAction(timeSinceLastAction, lastAction, oldFile, newFile);
+		final RefactorFileAction refFileAction = new RefactorFileAction(timeSinceLastAction, lastAction, oldFile, newFile, previousFile);
 		logger.logEclipseAction(refFileAction, DEFAULT_CONTEXT);
 		afterAction(refFileAction);
 	}

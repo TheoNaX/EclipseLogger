@@ -1,32 +1,46 @@
 package eclipselogger.events.actions;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import org.eclipse.core.resources.IFile;
 
+import eclipselogger.db.ActionDB;
+import eclipselogger.db.DynamicQuery;
 import eclipselogger.utils.FileValidator;
 import eclipselogger.utils.PackageUtils;
 
 public class SwitchToFileAction extends EclipseAction {
 	
-	public static final String TABLE_NAME = "add_file";
+	public static final String TABLE_NAME = "switch_file";
 	
-	private IFile switchedToFile;
-	private IFile previousFile;
-	private boolean samePackage;
-	private boolean sameProject;
-	private boolean sameFileType;
+	private final String switchedToFile;
+	private final String previousFile;
+	private final boolean samePackage;
+	private final boolean sameProject;
+	private final boolean sameFileType;
 	
 	
-	public SwitchToFileAction(long timeSinceLastAction, EclipseAction previousAction, IFile openedFile, IFile previousFile) {
+	public SwitchToFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile openedFile, final IFile previousFile) {
 		super(timeSinceLastAction, previousAction);
-		this.switchedToFile = openedFile;
-		this.previousFile = previousFile;
-		samePackage = PackageUtils.checkIfSamePackage(openedFile, previousFile);
-		sameProject = PackageUtils.checkIfSameProject(openedFile, previousFile);
-		sameFileType = FileValidator.haveFilesTheSameExtension(openedFile, previousFile);
+		this.switchedToFile = openedFile.getProjectRelativePath().toOSString();
+		this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		this.samePackage = PackageUtils.checkIfSamePackage(openedFile, previousFile);
+		this.sameProject = PackageUtils.checkIfSameProject(openedFile, previousFile);
+		this.sameFileType = FileValidator.haveFilesTheSameExtension(openedFile, previousFile);
+	}
+	
+	public SwitchToFileAction(final ResultSet rs) throws SQLException {
+		super(rs);
+		this.previousFile = rs.getString(ActionDB.PREVIOUS_FILE);
+		this.switchedToFile = rs.getString(ActionDB.SWITCHED_FILE);
+		this.samePackage = rs.getBoolean(ActionDB.SAME_PACKAGE);
+		this.sameProject = rs.getBoolean(ActionDB.SAME_PROJECT);
+		this.sameFileType = rs.getBoolean(ActionDB.SAME_TYPE);
 	}
 	
 	public boolean openedInSamePackage() {
-		return samePackage;
+		return this.samePackage;
 	}
 	
 	public int getPackageDistance() {
@@ -34,11 +48,11 @@ public class SwitchToFileAction extends EclipseAction {
 		return 0;
 	}
 	
-	public IFile getSwitchedToFile() {
+	public String getSwitchedToFile() {
 		return this.switchedToFile;
 	}
 	
-	public IFile getPreviousOpenedFile() {
+	public String getPreviousOpenedFile() {
 		return this.previousFile;
 	}
 	
@@ -53,6 +67,28 @@ public class SwitchToFileAction extends EclipseAction {
 	@Override
 	public ActionType getActionType() {
 		return ActionType.SWITCH_FILE;
+	}
+	
+	@Override
+	public String toString() {
+		return "Action: " + getActionType() + 
+				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
+				", switched file: " + this.switchedToFile + ", previous file: " + this.previousFile;
+	}
+
+	public static DynamicQuery createQuery() {
+		final DynamicQuery query = new DynamicQuery(TABLE_NAME, EclipseAction.createQuery());
+
+		query.addColumnToSelect(ActionDB.SAME_PACKAGE);
+		query.addColumnToSelect(ActionDB.SAME_PROJECT);
+		query.addColumnToSelect(ActionDB.SAME_TYPE);
+		query.addColumnToSelect(ActionDB.SWITCHED_FILE);
+		query.addColumnToSelect(ActionDB.PREVIOUS_FILE);
+		
+		query.setJoinColumn(ActionDB.ACTION_ID);
+		query.setJoinColumnForJoinedTable(ActionDB.ECLIPSE_ACTION_ID);
+		
+		return query;
 	}
 	
 }

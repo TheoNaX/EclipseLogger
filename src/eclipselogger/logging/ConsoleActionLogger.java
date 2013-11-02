@@ -88,7 +88,7 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 	private void logSwitchToFileAction(final EclipseAction action) {
 		final SwitchToFileAction switchAction = (SwitchToFileAction) action;
 		System.out.println("============================================");
-		System.out.println("File switched: " + switchAction.getSwitchedToFile().getProjectRelativePath());
+		System.out.println("File switched: " + switchAction.getSwitchedToFile());
 		System.out.println("In same package: " + switchAction.openedInSamePackage() + ", in same project: " + switchAction.openedInSameProject() + ", same file type: " + switchAction.isTheSameTypeAsPreviuos());
 		logCommonParams(action);
 		System.out.println("============================================");
@@ -114,7 +114,7 @@ public class ConsoleActionLogger implements EclipseActiontLogIF {
 	private void logPackageRefactorAction(final EclipseAction action) {
 		final RefactorPackageAction packageAction = (RefactorPackageAction) action;
 		System.out.println("============================================");
-		System.out.println("Package refactored, old:" + packageAction.getOldFilePath() + ", new: " + packageAction.getNewFilePath());
+		System.out.println("Package refactored, old:" + packageAction.getRefactoredPackage());
 		logCommonParams(action);
 		System.out.println("============================================");
 	}

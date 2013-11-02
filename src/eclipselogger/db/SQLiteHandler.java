@@ -11,44 +11,45 @@ import eclipselogger.events.actions.EclipseAction;
 
 
 public class SQLiteHandler {
-	private String sDriverName = "org.sqlite.JDBC";
+	private final String sDriverName = "org.sqlite.JDBC";
 	
-	private String dbName = "eclipselog.db";
-	private String sJdbc = "jdbc:sqlite";
-	private String dbUrl = sJdbc + ":" + dbName;
+	private final String dbName = "eclipselog.db";
+	private final String sJdbc = "jdbc:sqlite";
+	private final String dbUrl = this.sJdbc + ":" + this.dbName;
 	
 	private Connection conn;
 	
 	public void initConnection() throws Exception {
-		Class.forName(sDriverName);
-		conn = DriverManager.getConnection(dbUrl);
+		Class.forName(this.sDriverName);
+		this.conn = DriverManager.getConnection(this.dbUrl);
+		System.out.println(">>>>>>>>>>>>> Connection to database established !!!");
 	}
 	
 	private void checkConnection() throws Exception {
 		try {
-			if (conn == null || conn.isClosed()) {
+			if (this.conn == null || this.conn.isClosed()) {
 				initConnection();
 			}
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			throw new Exception("Failed to initiate database connection!!!");
 		}
 	}
 	
-	public void executeSQLInsert(String sqlInsert) throws Exception {
+	public void executeSQLInsert(final String sqlInsert) throws Exception {
 		checkConnection();
 		Statement statement;
 		try {
-			statement = conn.createStatement();
+			statement = this.conn.createStatement();
 			statement.executeUpdate(sqlInsert);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			throw new Exception("Failed to execute SQL: " + sqlInsert);
 		}
 	}
 	
-	public PreparedStatement prepareStatement(String sql) throws Exception {
+	public PreparedStatement prepareStatement(final String sql) throws Exception {
 		checkConnection();
-		PreparedStatement pst = conn.prepareStatement(sql);
+		final PreparedStatement pst = this.conn.prepareStatement(sql);
 		
 		return pst;
 	}
@@ -56,13 +57,14 @@ public class SQLiteHandler {
 	public int getNextSequenceNumberForAction() throws Exception {
 		int seqNo = 0;
 		checkConnection();
-		String sql = "SELECT seq FROM SQLITE_SEQUENCE WHERE name='" + EclipseAction.TABLE_NAME + "';";
-		ResultSet rs = conn.createStatement().executeQuery(sql);
+		final String sql = "SELECT seq FROM SQLITE_SEQUENCE WHERE name='" + EclipseAction.TABLE_NAME + "';";
+		final ResultSet rs = this.conn.createStatement().executeQuery(sql);
 		if (rs.next()) {
 			seqNo = rs.getInt(1) + 1;
 			return seqNo;
 		} else {
-			throw new Exception("Failed to get sequence number");
+			System.out.println(">>>>>>>> Resultset empty, returning 1 !!!");
+			return 1;
 		}
 		
 		

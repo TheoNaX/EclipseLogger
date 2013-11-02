@@ -100,8 +100,8 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.setBoolean(2, switchFile.openedInSamePackage());
 			ps.setBoolean(3, switchFile.openedInSameProject());
 			ps.setBoolean(4, switchFile.isTheSameTypeAsPreviuos());
-			ps.setString(5, switchFile.getSwitchedToFile().getProjectRelativePath().toOSString());
-			ps.setString(6, switchFile.getPreviousOpenedFile().getProjectRelativePath().toOSString());
+			ps.setString(5, switchFile.getSwitchedToFile());
+			ps.setString(6, switchFile.getPreviousOpenedFile());
 			
 			ps.executeUpdate();
 			
@@ -341,14 +341,15 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 	}
 	
 	private void insertEclipseActionIntoDb(final EclipseAction action, final boolean context) throws Exception {
-		final String sql = "INSERT INTO eclipse_action(last_action, time_since_last, action, context_change) VALUES (?, ?, ?, ?)";
+		final String sql = "INSERT INTO eclipse_action(last_action, time_since_last, action, context_change, send_status) VALUES (?, ?, ?, ?, ?)";
 		PreparedStatement ps = null;
 		try {
 			ps = this.dbHandler.prepareStatement(sql);
-			ps.setInt(1, action.getPreviousAction().getActionType().getValue());
+			ps.setInt(1, action.getPreviousAction());
 			ps.setLong(2, action.getTimeSinceLastAction());
 			ps.setInt(3, action.getActionType().getValue());
 			ps.setBoolean(4, context);
+			ps.setInt(5, EclipseAction.SEND_STATUS_UNSENT);
 			
 			ps.executeUpdate();
 		}
