@@ -11,6 +11,7 @@ public abstract class EclipseAction {
 	protected long timeSinceLastAction;
 	protected int previousAction;
 	protected int action_id;
+	private boolean contextChange;
 	
 	public static final String TABLE_NAME = "eclipse_action";
 	
@@ -26,6 +27,7 @@ public abstract class EclipseAction {
 		this.timeSinceLastAction = rs.getLong(ActionDB.TIME_SINCE_LAST);
 		this.previousAction = rs.getInt(ActionDB.LAST_ACTION);
 		this.action_id = rs.getInt(ActionDB.ECLIPSE_ACTION_ID);
+		this.contextChange = rs.getBoolean(ActionDB.CONTEXT);
 	}
 	
 	public abstract ActionType getActionType(); 
@@ -40,6 +42,10 @@ public abstract class EclipseAction {
 	
 	public int getActionId() {
 		return this.action_id;
+	}
+	
+	public boolean getContextChange() {
+		return this.contextChange;
 	}
 	
 	public static DynamicQuery createQuery() {

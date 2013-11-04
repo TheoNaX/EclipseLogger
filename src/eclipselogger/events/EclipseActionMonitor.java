@@ -32,7 +32,6 @@ public class EclipseActionMonitor {
 	
 	private static IFile actualFile;
 	private static IFile previousFile;
-	private static IProject actualProject;
 	private static long fileWorkStart;
 	private static EclipseAction lastAction;
 	private static long lastActionTime;
@@ -206,6 +205,10 @@ public class EclipseActionMonitor {
 	private static void afterAction(final EclipseAction action) {
 		lastAction = action;
 		lastActionTime = System.currentTimeMillis();
+	}
+	
+	public static void logEclipseAction(final EclipseAction action, final boolean contextChange) {
+		logger.logEclipseAction(action, contextChange);
 	}
 	
 	

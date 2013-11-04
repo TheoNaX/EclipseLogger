@@ -129,7 +129,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.setBoolean(3, refactorPack.isSameProject());
 			ps.setString(4, refactorPack.getRefactorType());
 			ps.setString(5, refactorPack.getRefactoredPackage());
-			ps.setString(6, refactorPack.getLastFile());
+			ps.setString(6, refactorPack.getPreviousFile());
 			
 			ps.executeUpdate();
 			

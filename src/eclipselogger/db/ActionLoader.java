@@ -27,35 +27,27 @@ public class ActionLoader {
 
 	SQLiteHandler dbHandler = new SQLiteHandler();
 	
-	public List<EclipseAction> loadEclipseActionsInLastFiveMinutes() {
+	public List<EclipseAction> loadEclipseActionsInLastFiveMinutes() throws Exception {
 		final List<EclipseAction> actions = new ArrayList<EclipseAction>();
 		final Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MINUTE, -5);
 		final Date limitTime = cal.getTime();
 		final WhereParam param = new DynamicQuery.WhereParam(("b." + ActionDB.TIMESTAMP), DynamicQuery.WhereParam.CONDITION_LARGER);
 		final ActionType[] actionTypes = ActionType.values();
-		try {
 		for (int i=0; i<actionTypes.length; i++) {
 			loadEclipseActions(actionTypes[i], actions, param, limitTime);
-		}
-		} catch (final Exception e) {
-			e.printStackTrace();
 		}
 		
 		return actions;
 	}
 	
-	public List<EclipseAction> loadNotSentEclipseActions() {
+	public List<EclipseAction> loadNotSentEclipseActions() throws Exception {
 		final List<EclipseAction> actions = new ArrayList<EclipseAction>();
 		
 		final WhereParam param = new DynamicQuery.WhereParam(("b." + ActionDB.SEND_STATUS));
 		final ActionType[] actionTypes = ActionType.values();
-		try {
 		for (int i=0; i<actionTypes.length; i++) {
 			loadEclipseActions(actionTypes[i], actions, param, EclipseAction.SEND_STATUS_UNSENT);
-		}
-		} catch (final Exception e) {
-			e.printStackTrace();
 		}
 		
 		return actions;
@@ -155,6 +147,18 @@ public class ActionLoader {
 		}
 		
 		return query;
+	}
+	
+	public void updateActionSendStatus(final int actionID, final int sendStatus) throws Exception {
+		final String sql = "UPDATE " + EclipseAction.TABLE_NAME + " SET " + ActionDB.SEND_STATUS + " = ? WHERE " + ActionDB.ACTION_ID + " = ?";
+		PreparedStatement ps = null;
+		try {
+			ps = this.dbHandler.prepareStatement(sql);
+			ps.setInt(1, sendStatus);
+			ps.setInt(2, actionID);
+		} finally {
+			DBCleanupTool.closeStatement(ps);
+		}
 	}
 	
 }

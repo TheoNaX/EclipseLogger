@@ -23,9 +23,7 @@ public class RefactorFileAction extends EclipseAction {
 	private final boolean sameProject;
 	private final String previousFile;
 	private final String refactoredFile;
-	
-	// TODO same package + same project 
-	
+		
 	
 	public RefactorFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile oldFile, final IFile newFile, final IFile previousFile) {
 		super(timeSinceLastAction, previousAction);

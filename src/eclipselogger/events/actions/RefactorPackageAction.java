@@ -68,7 +68,7 @@ public class RefactorPackageAction extends EclipseAction {
 		return ActionType.REFACTOR_PACKAGE;
 	}
 	
-	public String getLastFile() {
+	public String getPreviousFile() {
 		return this.previousFile;
 	}
 	
