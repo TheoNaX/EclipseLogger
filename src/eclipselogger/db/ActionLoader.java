@@ -43,7 +43,7 @@ public class ActionLoader {
 	
 	public List<EclipseAction> loadNotSentEclipseActions() throws Exception {
 		final List<EclipseAction> actions = new ArrayList<EclipseAction>();
-		
+		// TODO implement check if there is some unsent messages. If not, joins are not necessary - performance
 		final WhereParam param = new DynamicQuery.WhereParam(("b." + ActionDB.SEND_STATUS));
 		final ActionType[] actionTypes = ActionType.values();
 		for (int i=0; i<actionTypes.length; i++) {
@@ -57,7 +57,8 @@ public class ActionLoader {
 		final DynamicQuery query = createQuery(actionType);
 		query.addWhereParam(param);
 		
-		final PreparedStatement ps = this.dbHandler.prepareStatement(query.buildQuery());
+		final String sqlQuery = query.buildQuery();
+		final PreparedStatement ps = this.dbHandler.prepareStatement(sqlQuery);
 		ps.setObject(1, value);
 		
 		ResultSet rs = null;
@@ -70,6 +71,7 @@ public class ActionLoader {
 		} finally {
 			DBCleanupTool.closeResultSet(rs);
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 	
@@ -150,14 +152,16 @@ public class ActionLoader {
 	}
 	
 	public void updateActionSendStatus(final int actionID, final int sendStatus) throws Exception {
-		final String sql = "UPDATE " + EclipseAction.TABLE_NAME + " SET " + ActionDB.SEND_STATUS + " = ? WHERE " + ActionDB.ACTION_ID + " = ?";
+		final String sql = "UPDATE " + EclipseAction.TABLE_NAME + " SET " + ActionDB.SEND_STATUS + " = ? WHERE " + ActionDB.ECLIPSE_ACTION_ID + " = ?";
 		PreparedStatement ps = null;
 		try {
 			ps = this.dbHandler.prepareStatement(sql);
 			ps.setInt(1, sendStatus);
 			ps.setInt(2, actionID);
+			ps.executeUpdate();
 		} finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 	

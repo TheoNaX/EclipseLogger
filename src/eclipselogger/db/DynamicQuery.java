@@ -25,7 +25,7 @@ public class DynamicQuery {
 	}
 	
 	public void addColumnToSelect(final String columnName) {
-		this.columnsFromJoinedTable.add(columnName);
+		this.columnsToSelect.add(columnName);
 	}
 	
 	public void setTableName(final String tableName) {
@@ -79,7 +79,7 @@ public class DynamicQuery {
 			sb.deleteCharAt(sb.lastIndexOf(", "));
 		}
 		sb.append(" FROM " + this.tableName + " a");
-		sb.append(" INNER JOIN " + this.joinedTableName);
+		sb.append(" INNER JOIN " + this.joinedTableName + " b");
 		sb.append(" ON a." + this.tableJoinColumn + " = b." + this.joinedTableJoinColumn);
 		
 		if (this.whereParams.size() > 0) {

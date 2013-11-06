@@ -18,7 +18,7 @@ public class DeleteFileAction extends EclipseAction {
 	public static final String TABLE_NAME = "delete_file";
 	
 	private final String deletedFile;
-	private final String previousFile;
+	private String previousFile;
 	private final boolean samePackage;
 	private final boolean sameProject;
 	private final boolean sameFileType;
@@ -30,7 +30,9 @@ public class DeleteFileAction extends EclipseAction {
 	public DeleteFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile deletedFile, final IFile previoiusFile, final WorkingFile workFile) {
 		super(timeSinceLastAction, previousAction);
 		this.deletedFile = deletedFile.getProjectRelativePath().toOSString();
-		this.previousFile = previoiusFile.getProjectRelativePath().toOSString();
+		if (this.previousFile != null) {
+			this.previousFile = previoiusFile.getProjectRelativePath().toOSString();
+		}
 		this.samePackage = PackageUtils.checkIfSamePackage(deletedFile, previoiusFile);
 		this.sameProject = PackageUtils.checkIfSameProject(deletedFile, previoiusFile);
 		this.sameFileType = FileValidator.haveFilesTheSameExtension(deletedFile, previoiusFile);

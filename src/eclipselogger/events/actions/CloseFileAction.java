@@ -17,7 +17,7 @@ public class CloseFileAction extends EclipseAction {
 	public static final String TABLE_NAME = "close_file";
 	
 	private final String closedFile;
-	private final String previousFile;
+	private String previousFile;
 	private final boolean samePackage;
 	private final boolean sameProject;
 	private final boolean sameFileType;
@@ -27,7 +27,9 @@ public class CloseFileAction extends EclipseAction {
 	public CloseFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile closedFile, final IFile previousFile, final WorkingFile workFile) {
 		super(timeSinceLastAction, previousAction);
 		this.closedFile = closedFile.getProjectRelativePath().toOSString();
-		this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		if (previousFile != null) {
+			this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		}
 		this.samePackage = PackageUtils.checkIfSamePackage(closedFile, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(closedFile, previousFile);
 		this.sameFileType = FileValidator.haveFilesTheSameExtension(closedFile, previousFile);

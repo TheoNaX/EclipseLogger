@@ -22,6 +22,7 @@ public class SQLiteHandler {
 	public void initConnection() throws Exception {
 		Class.forName(this.sDriverName);
 		this.conn = DriverManager.getConnection(this.dbUrl);
+		this.conn.setAutoCommit(true);
 		System.out.println(">>>>>>>>>>>>> Connection to database established !!!");
 	}
 	
@@ -33,6 +34,11 @@ public class SQLiteHandler {
 		} catch (final SQLException e) {
 			throw new Exception("Failed to initiate database connection!!!");
 		}
+	}
+	
+	public Connection getConnection() throws Exception {
+		checkConnection();
+		return this.conn;
 	}
 	
 	public void executeSQLInsert(final String sqlInsert) throws Exception {
@@ -67,10 +73,17 @@ public class SQLiteHandler {
 			return 1;
 		}
 		
-		
 	}
 	
-	
+	public void disposeConnection() {
+		try {
+			if (this.conn != null) {
+				this.conn.close();
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+	}
 	
 	
 }

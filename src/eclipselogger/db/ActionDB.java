@@ -32,7 +32,7 @@ public class ActionDB {
 	public static final String WORK_TIME = "work_time";
 	
 	// delete file
-	public static final String DELETED_FILE = "deleted_time";
+	public static final String DELETED_FILE = "deleted_file";
 	
 	// delete package
 	public static final String DELETED_PACKAGE = "deleted_package";

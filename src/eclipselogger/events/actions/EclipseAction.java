@@ -20,7 +20,7 @@ public abstract class EclipseAction {
 	
 	public EclipseAction(final long timeSinceLastAction, final EclipseAction previousAction) {
 		this.timeSinceLastAction = timeSinceLastAction;
-		this.previousAction = previousAction.getActionType().getValue();
+		this.previousAction = (previousAction != null) ? previousAction.getActionType().getValue() : 0;
 	}
 	
 	public EclipseAction(final ResultSet rs) throws SQLException {
@@ -51,7 +51,6 @@ public abstract class EclipseAction {
 	public static DynamicQuery createQuery() {
 		final DynamicQuery query = new DynamicQuery(TABLE_NAME);
 		query.addColumnToSelect(ActionDB.ECLIPSE_ACTION_ID);
-		query.addColumnToSelect(ActionDB.LAST_ACTION);
 		query.addColumnToSelect(ActionDB.TIME_SINCE_LAST);
 		query.addColumnToSelect(ActionDB.ACTION_TYPE);
 		query.addColumnToSelect(ActionDB.CONTEXT);

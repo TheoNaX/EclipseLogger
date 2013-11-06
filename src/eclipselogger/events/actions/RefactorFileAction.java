@@ -21,7 +21,7 @@ public class RefactorFileAction extends EclipseAction {
 	private final String refactorType;
 	private final boolean samePackage;
 	private final boolean sameProject;
-	private final String previousFile;
+	private String previousFile;
 	private final String refactoredFile;
 		
 	
@@ -30,7 +30,9 @@ public class RefactorFileAction extends EclipseAction {
 		this.oldFilePath = oldFile.getProjectRelativePath().toOSString();
 		this.newFilePath = newFile.getProjectRelativePath().toOSString();
 		this.refactorType = resolveRefactorType(oldFile, newFile);
-		this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		if (previousFile != null) {
+			this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		}
 		this.samePackage = PackageUtils.checkIfSamePackage(oldFile, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(oldFile, previousFile);
 		this.refactoredFile = newFile.getProjectRelativePath().toOSString();

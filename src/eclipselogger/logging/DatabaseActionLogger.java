@@ -81,6 +81,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			e.printStackTrace();
 		} finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 		
 	}
@@ -110,6 +111,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			e.printStackTrace();
 		} finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 
@@ -138,6 +140,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			e.printStackTrace();
 		} finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 
@@ -166,6 +169,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			e.printStackTrace();
 		} finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 
@@ -194,6 +198,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			e.printStackTrace();
 		} finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 
@@ -221,6 +226,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			e.printStackTrace();
 		} finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 
@@ -254,6 +260,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			e.printStackTrace();
 		} finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 
@@ -286,6 +293,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			System.err.println("FAILED to log CLOSE FILE ACTION to database!");
 		} finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 
@@ -310,6 +318,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			e.printStackTrace();
 		} finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 
@@ -322,7 +331,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			insertEclipseActionIntoDb(action, context);
 			
 			// insert concrete action specific parameters
-			final String sql = "INSERT INTO " + DeletePackageAction.TABLE_NAME + " (action_id, same_package, same_project, added_package, previous_file) VALUES (?, ?, ?, ?, ?)";
+			final String sql = "INSERT INTO " + AddPackageAction.TABLE_NAME + " (action_id, same_package, same_project, added_package, previous_file) VALUES (?, ?, ?, ?, ?)";
 			ps = this.dbHandler.prepareStatement(sql);
 			ps.setInt(1, seqNo);
 			ps.setBoolean(2, addPack.isSamePackage());
@@ -337,6 +346,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			e.printStackTrace();
 		} finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 	
@@ -355,6 +365,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 		}
 		finally {
 			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
 		}
 	}
 

@@ -43,7 +43,7 @@ public class LoggingView extends ViewPart {
     private final IResourceChangeListener resourceListener = new ResourceChangeListener();
     
     // create thread, which is sending Eclipse actions periodically to server
-    private final ActionFileSender fileSender = new ActionFileSender();
+    private ActionFileSender fileSender; 
     
     @Override
 	public void createPartControl(final Composite parent) {
@@ -52,6 +52,7 @@ public class LoggingView extends ViewPart {
        Workbench.getInstance().getActiveWorkbenchWindow().getPartService().addPartListener(this.listener);
        ResourcesPlugin.getWorkspace().addResourceChangeListener(this.resourceListener,
     	       IResourceChangeEvent.POST_CHANGE);
+       this.fileSender = new ActionFileSender();
     }
     @Override
 	public void setFocus() {

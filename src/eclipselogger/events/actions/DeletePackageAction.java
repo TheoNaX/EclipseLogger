@@ -14,7 +14,7 @@ public class DeletePackageAction extends EclipseAction {
 	
 	public static final String TABLE_NAME = "delete_package";
 	
-	private final String previousFile;
+	private String previousFile;
 	private final String deletedPackage;
 	private final boolean samePackage;
 	private final boolean sameProject;	
@@ -22,7 +22,9 @@ public class DeletePackageAction extends EclipseAction {
 	public DeletePackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFolder deletedPackage, final IFile previousFile) {
 		super(timeSinceLastAction, previousAction);
 		this.deletedPackage = deletedPackage.getProjectRelativePath().toOSString();
-		this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		if (previousFile != null) {
+			this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		}
 		this.samePackage = PackageUtils.checkIfSamePackage(deletedPackage, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(deletedPackage, previousFile);
 	}

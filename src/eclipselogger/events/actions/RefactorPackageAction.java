@@ -20,7 +20,7 @@ public class RefactorPackageAction extends EclipseAction {
 	private final String refactorType;
 	private final boolean samePackage;
 	private final boolean sameProject;
-	private final String previousFile;
+	private String previousFile;
 	private String refactoredPackage;
 	
 	public boolean isSamePackage() {
@@ -31,12 +31,14 @@ public class RefactorPackageAction extends EclipseAction {
 		return this.sameProject;
 	}
 
-	public RefactorPackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFolder oldPackage, final IFolder newPackage, final IFile previous) {
+	public RefactorPackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFolder oldPackage, final IFolder newPackage, final IFile previousFile) {
 		super(timeSinceLastAction, previousAction);
 		this.refactorType = resolveRefactorType(oldPackage, newPackage);
-		this.previousFile = previous.getProjectRelativePath().toOSString();
-		this.samePackage = PackageUtils.checkIfSamePackage(oldPackage, previous);
-		this.sameProject = PackageUtils.checkIfSameProject(oldPackage, previous);
+		if (previousFile != null) {
+			this.previousFile = previousFile.getProjectRelativePath().toOSString();
+		}
+		this.samePackage = PackageUtils.checkIfSamePackage(oldPackage, previousFile);
+		this.sameProject = PackageUtils.checkIfSameProject(oldPackage, previousFile);
 	}
 	
 	public RefactorPackageAction(final ResultSet rs) throws SQLException {

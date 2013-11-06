@@ -15,10 +15,11 @@ public class ActionFileSender implements Runnable {
 	
 	private boolean shouldStop = false;
 	
-	private final int SEND_INTERVAL = 10 * 60 * 1000; // 10 minutes
+	private final int SEND_INTERVAL = 1 * 60 * 1000; // 10 minutes
 
 	private final ActionLoader dbActionLoader = new ActionLoader();
-	private final ActionUploaderIF sender = new RESTActionUploader();
+	// private final ActionUploaderIF sender = new RESTActionUploader();
+	private final ActionUploaderIF sender = new DummyLocalUploader();
 	private final ActionFormatterIF formatter = new XMLActionFormatter();
 	
 	public ActionFileSender() {
@@ -31,7 +32,10 @@ public class ActionFileSender implements Runnable {
 		while (!this.shouldStop) {
 			try {
 				Thread.sleep(this.SEND_INTERVAL);
-			} catch (final Exception ignore) {} // TODO maybe some check of last execution??
+			} catch (final Exception ignore) {
+				this.shouldStop = true;
+			} 
+			
 			// process all unsent eclipse actions
 			processUnsentEclipseActions();
 		}
