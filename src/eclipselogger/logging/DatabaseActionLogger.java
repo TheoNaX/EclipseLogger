@@ -2,6 +2,8 @@ package eclipselogger.logging;
 
 import java.sql.PreparedStatement;
 
+import org.apache.log4j.Logger;
+
 import eclipselogger.db.SQLiteHandler;
 import eclipselogger.events.actions.AddFileAction;
 import eclipselogger.events.actions.AddPackageAction;
@@ -18,7 +20,8 @@ import eclipselogger.utils.DBCleanupTool;
 
 public class DatabaseActionLogger implements EclipseActiontLogIF {
 	
-	SQLiteHandler dbHandler = new SQLiteHandler();
+	private final SQLiteHandler dbHandler = new SQLiteHandler();
+	private final Logger logger = Logger.getLogger(DatabaseActionLogger.class);
 
 	@Override
 	public void logEclipseAction(final EclipseAction action, final boolean context) {
@@ -77,8 +80,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.executeUpdate();
 			
 		} catch (final Exception e) {
-			System.err.println("FAILED to log ADD FILE ACTION to database!");
-			e.printStackTrace();
+			this.logger.error("FAILED to log ADD FILE ACTION to database!", e);
 		} finally {
 			DBCleanupTool.closeStatement(ps);
 			this.dbHandler.disposeConnection();
@@ -107,8 +109,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.executeUpdate();
 			
 		} catch (final Exception e) {
-			System.err.println("FAILED to log SWITCH TO FILE ACTION to database!");
-			e.printStackTrace();
+			this.logger.error("FAILED to log SWITCH TO FILE ACTION to database!", e);
 		} finally {
 			DBCleanupTool.closeStatement(ps);
 			this.dbHandler.disposeConnection();
@@ -136,8 +137,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.executeUpdate();
 			
 		} catch (final Exception e) {
-			System.err.println("FAILED to log REFACTOR PACKAGE ACTION to database!");
-			e.printStackTrace();
+			this.logger.error("FAILED to log REFACTOR PACKAGE ACTION to database!", e);
 		} finally {
 			DBCleanupTool.closeStatement(ps);
 			this.dbHandler.disposeConnection();
@@ -165,8 +165,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.executeUpdate();
 			
 		} catch (final Exception e) {
-			System.err.println("FAILED to log REFACTOR FILE ACTION to database!");
-			e.printStackTrace();
+			this.logger.error("FAILED to log REFACTOR FILE ACTION to database!", e);
 		} finally {
 			DBCleanupTool.closeStatement(ps);
 			this.dbHandler.disposeConnection();
@@ -194,8 +193,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.executeUpdate();
 			
 		} catch (final Exception e) {
-			System.err.println("FAILED to log OPEN FILE ACTION to database!");
-			e.printStackTrace();
+			this.logger.error("FAILED to log OPEN FILE ACTION to database!", e);
 		} finally {
 			DBCleanupTool.closeStatement(ps);
 			this.dbHandler.disposeConnection();
@@ -222,8 +220,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.executeUpdate();
 			
 		} catch (final Exception e) {
-			System.err.println("FAILED to log DELETE PACKAGE ACTION to database!");
-			e.printStackTrace();
+			this.logger.error("FAILED to log DELETE PACKAGE ACTION to database!", e);
 		} finally {
 			DBCleanupTool.closeStatement(ps);
 			this.dbHandler.disposeConnection();
@@ -256,8 +253,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.executeUpdate();
 			
 		} catch (final Exception e) {
-			System.err.println("FAILED to log DELETE FILE ACTION to database!");
-			e.printStackTrace();
+			this.logger.error("FAILED to log DELETE FILE ACTION to database!", e);
 		} finally {
 			DBCleanupTool.closeStatement(ps);
 			this.dbHandler.disposeConnection();
@@ -290,7 +286,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.executeUpdate();
 			
 		} catch (final Exception e) {
-			System.err.println("FAILED to log CLOSE FILE ACTION to database!");
+			this.logger.error("FAILED to log CLOSE FILE ACTION to database!", e);
 		} finally {
 			DBCleanupTool.closeStatement(ps);
 			this.dbHandler.disposeConnection();
@@ -314,8 +310,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.executeUpdate();
 			
 		} catch (final Exception e) {
-			System.err.println("FAILED to log ADD PROJECT ACTION to database!");
-			e.printStackTrace();
+			this.logger.error("FAILED to log ADD PROJECT ACTION to database!", e);
 		} finally {
 			DBCleanupTool.closeStatement(ps);
 			this.dbHandler.disposeConnection();
@@ -342,8 +337,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.executeUpdate();
 			
 		} catch (final Exception e) {
-			System.err.println("FAILED to log ADD PACKAGE ACTION to database!");
-			e.printStackTrace();
+			this.logger.error("FAILED to log ADD PACKAGE ACTION to database!", e);
 		} finally {
 			DBCleanupTool.closeStatement(ps);
 			this.dbHandler.disposeConnection();

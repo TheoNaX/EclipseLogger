@@ -3,7 +3,12 @@ package eclipselogger.db;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class DynamicQuery {
+	
+	private final Logger logger = Logger.getLogger(DynamicQuery.class);
+	
 	private String tableName;
 	private String tableJoinColumn;
 	private String joinedTableName;
@@ -87,7 +92,7 @@ public class DynamicQuery {
 		}
 		sb.append(";");
 		
-		System.out.println(">>>>>>>>> QUERY: " + sb);
+		this.logger.debug(">>>>>>>>> QUERY: " + sb);
 		return sb.toString();
 	}
 	
@@ -112,7 +117,7 @@ public class DynamicQuery {
 		
 		sb.append(";");
 		
-		System.out.println(">>>>>>>>> QUERY: " + sb);
+		this.logger.debug(">>>>>>>>> QUERY: " + sb);
 		return sb.toString();
 		
 	}

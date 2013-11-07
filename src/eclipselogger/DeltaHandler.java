@@ -3,6 +3,7 @@ package eclipselogger;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -16,16 +17,17 @@ import eclipselogger.utils.FileValidator;
 
 public class DeltaHandler implements IResourceDeltaVisitor {
 
-	private List<DeltaEntry> actualDelta = new ArrayList<DeltaEntry>(); 
+	private final List<DeltaEntry> actualDelta = new ArrayList<DeltaEntry>(); 
+	private final Logger logger = Logger.getLogger(DeltaHandler.class);
 	
 	public void startDeltaHandling() {
-		actualDelta.clear();
+		this.actualDelta.clear();
 	}
 	
 	public void stopDeltaHandling() {
-		if (actualDelta.size() == 0) {
+		if (this.actualDelta.size() == 0) {
 			return;
-		} else if (actualDelta.size() == 1) {
+		} else if (this.actualDelta.size() == 1) {
 			handleOneResourceChange();
 		} else {
 			handleMoreResourceChanges();
@@ -33,22 +35,22 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 	}
 	
 	private void handleMoreResourceChanges() {
-		if (actualDelta.size() != 2) {
-			System.out.println("Something is wrong, only 2 changes should be in one delta");
+		if (this.actualDelta.size() != 2) {
+			this.logger.debug("Something is wrong, only 2 changes should be in one delta");
 		} else {
-			DeltaEntry firstEntry = actualDelta.get(0);
-			DeltaEntry secondEntry = actualDelta.get(1);
+			final DeltaEntry firstEntry = this.actualDelta.get(0);
+			final DeltaEntry secondEntry = this.actualDelta.get(1);
 			if ((firstEntry.getType() == IResourceDelta.REMOVED && secondEntry.getType() == IResourceDelta.ADDED)
 					|| (firstEntry.getType() == IResourceDelta.ADDED && secondEntry.getType() == IResourceDelta.REMOVED)) {
 				handleRefactoring(firstEntry, secondEntry);
 			} else {
-				System.out.println(">>> Something is wrong, 2 changes were made, but not refactoring!!!");
-				System.out.println("First: " + firstEntry.getType() + ", second: " + secondEntry.getType());
+				this.logger.debug(">>> Something is wrong, 2 changes were made, but not refactoring!!!");
+				this.logger.debug("First: " + firstEntry.getType() + ", second: " + secondEntry.getType());
 			}
 		}
 	}
 	
-	private void handleRefactoring(DeltaEntry firstEntry, DeltaEntry secondEntry) {
+	private void handleRefactoring(final DeltaEntry firstEntry, final DeltaEntry secondEntry) {
 		if (firstEntry.getResource().getType() == IResource.FILE && secondEntry.getResource().getType() == IResource.FILE) {
 			if (firstEntry.getType() == IResourceDelta.REMOVED) {
 				EclipseActionMonitor.refactorFile((IFile)firstEntry.getResource(), (IFile)secondEntry.getResource());
@@ -66,9 +68,9 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 	}
 	
 	private void handleOneResourceChange() {
-		DeltaEntry entry = actualDelta.get(0);
+		final DeltaEntry entry = this.actualDelta.get(0);
 		if (entry != null) {
-			IResource resource = entry.getResource();
+			final IResource resource = entry.getResource();
 			switch(entry.getType()) {
 			case IResourceDelta.ADDED:
 				handleResourceAdded(resource);
@@ -85,35 +87,35 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 		
 	}
 	
-	private void handleResourceAdded(IResource res) {
+	private void handleResourceAdded(final IResource res) {
 		if (res.getType() == IResource.FILE) {
-			IFile file = (IFile) res;
-			//System.out.println("File was added: " + file.getProjectRelativePath());
+			final IFile file = (IFile) res;
+			this.logger.debug("File was added: " + file.getProjectRelativePath());
 			EclipseActionMonitor.addFile(file);
 		} else if (res.getType() == IResource.FOLDER) {
-			IFolder folder = (IFolder) res;
-			//System.out.println("Folder / package was added: " + folder.getProjectRelativePath());
+			final IFolder folder = (IFolder) res;
+			this.logger.debug("Folder / package was added: " + folder.getProjectRelativePath());
 			EclipseActionMonitor.addFolder(folder);
 		} else if (res.getType() == IResource.PROJECT) {
-			IProject project = (IProject) res;
+			final IProject project = (IProject) res;
 			EclipseActionMonitor.addProject(project);
-			//System.out.println("Project was added: " + project.getName());
+			this.logger.debug("Project was added: " + project.getName());
 		}
 	}
 	
-	private void handleResourceRemoved(IResource res) {
+	private void handleResourceRemoved(final IResource res) {
 		if (res.getType() == IResource.FILE) {
-			IFile file = (IFile) res;
+			final IFile file = (IFile) res;
 			EclipseActionMonitor.deleteFile(file);
 		} else if (res.getType() == IResource.FOLDER) {
-			IFolder folder = (IFolder) res;
+			final IFolder folder = (IFolder) res;
 			EclipseActionMonitor.deleteFolder(folder);
 		}
 	}
 
 	@Override
-	public boolean visit(IResourceDelta delta) throws CoreException {
-		IResource res = delta.getResource();
+	public boolean visit(final IResourceDelta delta) throws CoreException {
+		final IResource res = delta.getResource();
 		boolean result = true;
 		
 		switch (delta.getKind()) {
@@ -131,60 +133,60 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 		return result;
 	}
 	 
-	private boolean handleChangeVisited(IResource res) {
+	private boolean handleChangeVisited(final IResource res) {
 		boolean result = true;
 		if (res.getType() == IResource.FILE) {
-			if (FileValidator.shouldBeFileLogged((IFile)res)) {
-				//System.out.println("File changed: " + res.getFullPath());
-				actualDelta.add(new DeltaEntry(IResourceDelta.CHANGED, res));
+			if (FileValidator.shouldBeFileLogged(res)) {
+				this.logger.debug("File changed: " + res.getFullPath());
+				this.actualDelta.add(new DeltaEntry(IResourceDelta.CHANGED, res));
 				result = false;
 			};
 		}
 		return result;
 	}
 
-	private boolean handleRemoveVisited(IResource res) {
+	private boolean handleRemoveVisited(final IResource res) {
 		boolean result = true;
 		if (res.getType() == IResource.FILE) {
-			if (FileValidator.shouldBeFileLogged((IFile)res)) {
+			if (FileValidator.shouldBeFileLogged(res)) {
 				result = false;
-				//System.out.println("File removed: " + res.getFullPath());
+				this.logger.debug("File removed: " + res.getFullPath());
 			}
 		} else if (res.getType() == IResource.FOLDER) {
-			if (!FileValidator.isInBinDirecotory((IFolder)res)) {
+			if (!FileValidator.isInBinDirecotory(res)) {
 				result = false;
-				//System.out.println("Folder / package removed: " + res.getFullPath());
+				this.logger.debug("Folder / package removed: " + res.getFullPath());
 			}
 		} else if (res.getType() == IResource.PROJECT) {
 			result = false;
-			//System.out.println("Project removed: " + res.getFullPath());
+			this.logger.debug("Project removed: " + res.getFullPath());
 		}
 		if (!result) {
-			actualDelta.add(new DeltaEntry(IResourceDelta.REMOVED, res));
+			this.actualDelta.add(new DeltaEntry(IResourceDelta.REMOVED, res));
 		}
 		
 		return result;
 	}
 
-	private boolean handleAddVisited(IResource res) {
+	private boolean handleAddVisited(final IResource res) {
 		boolean result = true;
 		if (res.getType() == IResource.FILE) {
-			if (FileValidator.shouldBeFileLogged((IFile)res)) {
+			if (FileValidator.shouldBeFileLogged(res)) {
 				result = false;
-				//System.out.println("File added: " + res.getFullPath());
+				this.logger.debug("File added: " + res.getFullPath());
 			}
 		} else if (res.getType() == IResource.FOLDER) {
-			if (!FileValidator.isInBinDirecotory((IFolder)res)) {
+			if (!FileValidator.isInBinDirecotory(res)) {
 				result = false;
-				//System.out.println("Folder / package added: " + res.getFullPath());
+				this.logger.debug("Folder / package added: " + res.getFullPath());
 			}
 		} else if (res.getType() == IResource.PROJECT) {
 			result = false;
-			//System.out.println("Project added: " + res.getFullPath());
+			this.logger.debug("Project added: " + res.getFullPath());
 		}
 		
 		if (!result) {
-			actualDelta.add(new DeltaEntry(IResourceDelta.ADDED, res));
+			this.actualDelta.add(new DeltaEntry(IResourceDelta.ADDED, res));
 		}
 		
 		return result;

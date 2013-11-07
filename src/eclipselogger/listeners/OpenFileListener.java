@@ -1,5 +1,6 @@
 package eclipselogger.listeners;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -13,77 +14,77 @@ import eclipselogger.events.EclipseActionMonitor;
 public class OpenFileListener implements IPartListener2 {
 	
 	private String lastOpened;
+	private final Logger logger = Logger.getLogger(OpenFileListener.class);
 
 	@Override
-	public void partActivated(IWorkbenchPartReference partRef) {
-		IWorkbenchPart part = partRef.getPart(false);
+	public void partActivated(final IWorkbenchPartReference partRef) {
+		final IWorkbenchPart part = partRef.getPart(false);
 		if (part instanceof ITextEditor) {
-			ITextEditor editor = (ITextEditor)part;
-			IEditorInput input = editor.getEditorInput();
+			final ITextEditor editor = (ITextEditor)part;
+			final IEditorInput input = editor.getEditorInput();
 			if (input instanceof IFileEditorInput) {
-				IFile file = ((IFileEditorInput)input).getFile();
-				if (lastOpened == null || !lastOpened.equals(file.getProjectRelativePath().toOSString())) {
+				final IFile file = ((IFileEditorInput)input).getFile();
+				if (this.lastOpened == null || !this.lastOpened.equals(file.getProjectRelativePath().toOSString())) {
+					this.logger.info("Switched to file: " + file.getProjectRelativePath().toOSString());
 					EclipseActionMonitor.switchToFile(file);
 				}
 			}
-			lastOpened = null;
+			this.lastOpened = null;
 		}
-		//System.out.println("Part activated!");
 		
 	}
 
 	@Override
-	public void partBroughtToTop(IWorkbenchPartReference partRef) {
+	public void partBroughtToTop(final IWorkbenchPartReference partRef) {
 		//System.out.println("part brought to top");
 	}
 
 	@Override
-	public void partClosed(IWorkbenchPartReference partRef) {
-		IWorkbenchPart part = partRef.getPart(false);
+	public void partClosed(final IWorkbenchPartReference partRef) {
+		final IWorkbenchPart part = partRef.getPart(false);
 		if (part instanceof ITextEditor) {
-			ITextEditor editor = (ITextEditor)part;
-			IEditorInput input = editor.getEditorInput();
+			final ITextEditor editor = (ITextEditor)part;
+			final IEditorInput input = editor.getEditorInput();
 			if (input instanceof IFileEditorInput) {
-				IFile file = ((IFileEditorInput)input).getFile();
-				//System.out.println("Closed file: " + file.getProjectRelativePath());
+				final IFile file = ((IFileEditorInput)input).getFile();
+				this.logger.info("File closed: " + file.getProjectRelativePath().toOSString());
 				EclipseActionMonitor.closeFile(file);
 			}
 		}
-		//System.out.println("Part closed");
 	}
 
 	@Override
-	public void partDeactivated(IWorkbenchPartReference partRef) {
+	public void partDeactivated(final IWorkbenchPartReference partRef) {
 		// System.out.println("Part deactivated");
 	}
 
 	@Override
-	public void partOpened(IWorkbenchPartReference partRef) {
-		IWorkbenchPart part = partRef.getPart(false);
+	public void partOpened(final IWorkbenchPartReference partRef) {
+		final IWorkbenchPart part = partRef.getPart(false);
 		if (part instanceof ITextEditor) {
-			ITextEditor editor = (ITextEditor)part;
-			IEditorInput input = editor.getEditorInput();
+			final ITextEditor editor = (ITextEditor)part;
+			final IEditorInput input = editor.getEditorInput();
 			if (input instanceof IFileEditorInput) {
-				IFile file = ((IFileEditorInput)input).getFile();
-				lastOpened = file.getProjectRelativePath().toOSString();
-				System.out.println("Opened new file: " + lastOpened);
+				final IFile file = ((IFileEditorInput)input).getFile();
+				this.lastOpened = file.getProjectRelativePath().toOSString();
+				this.logger.info("File opened: " + file.getProjectRelativePath().toOSString());
 				EclipseActionMonitor.openNewFile(file);
 			}
 		}
 	}
 
 	@Override
-	public void partHidden(IWorkbenchPartReference partRef) {
+	public void partHidden(final IWorkbenchPartReference partRef) {
 		// System.out.println("Part hidden");
 	}
 
 	@Override
-	public void partVisible(IWorkbenchPartReference partRef) {
+	public void partVisible(final IWorkbenchPartReference partRef) {
 		// System.out.println("Part visible");
 	}
 
 	@Override
-	public void partInputChanged(IWorkbenchPartReference partRef) {
+	public void partInputChanged(final IWorkbenchPartReference partRef) {
 		// System.out.println("Part input changed");
 	}
 

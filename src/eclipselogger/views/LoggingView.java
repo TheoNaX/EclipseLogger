@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.part.ViewPart;
 
+import eclipselogger.events.EclipseActionMonitor;
 import eclipselogger.listeners.OpenFileListener;
 import eclipselogger.listeners.ResourceChangeListener;
 import eclipselogger.sender.ActionFileSender;
@@ -53,7 +54,14 @@ public class LoggingView extends ViewPart {
        ResourcesPlugin.getWorkspace().addResourceChangeListener(this.resourceListener,
     	       IResourceChangeEvent.POST_CHANGE);
        this.fileSender = new ActionFileSender();
+       
+       // init loggers for actions - see config.properties
+       EclipseActionMonitor.init();
+       
+       // TODO init log4j
     }
+    
+    
     @Override
 	public void setFocus() {
        // set focus to my widget.  For a label, this doesn't
