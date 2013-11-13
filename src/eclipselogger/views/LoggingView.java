@@ -1,6 +1,7 @@
 package eclipselogger.views;
 
 
+import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -14,6 +15,7 @@ import eclipselogger.events.EclipseActionMonitor;
 import eclipselogger.listeners.OpenFileListener;
 import eclipselogger.listeners.ResourceChangeListener;
 import eclipselogger.sender.ActionFileSender;
+import eclipselogger.utils.ConfigReader;
 
 
 /**
@@ -53,12 +55,17 @@ public class LoggingView extends ViewPart {
        Workbench.getInstance().getActiveWorkbenchWindow().getPartService().addPartListener(this.listener);
        ResourcesPlugin.getWorkspace().addResourceChangeListener(this.resourceListener,
     	       IResourceChangeEvent.POST_CHANGE);
-       this.fileSender = new ActionFileSender();
+		try {
+			this.fileSender = new ActionFileSender();
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
        
        // init loggers for actions - see config.properties
        EclipseActionMonitor.init();
        
        // TODO init log4j
+       PropertyConfigurator.configure(ConfigReader.getProperties());
     }
     
     

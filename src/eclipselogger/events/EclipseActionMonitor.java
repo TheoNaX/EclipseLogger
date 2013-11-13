@@ -9,6 +9,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 
+import eclipselogger.events.actions.ActionType;
 import eclipselogger.events.actions.AddFileAction;
 import eclipselogger.events.actions.AddPackageAction;
 import eclipselogger.events.actions.AddProjectAction;
@@ -24,6 +25,7 @@ import eclipselogger.logging.ConsoleActionLogger;
 import eclipselogger.logging.DatabaseActionLogger;
 import eclipselogger.logging.EclipseActiontLogIF;
 import eclipselogger.logging.Log4jActionLogger;
+import eclipselogger.utils.ActionsCache;
 import eclipselogger.utils.ActualFileContentCache;
 import eclipselogger.utils.ConfigReader;
 import eclipselogger.utils.FileChanges;
@@ -47,10 +49,8 @@ public class EclipseActionMonitor {
 	
 	private static ActualFileContentCache fileContentCache = new ActualFileContentCache(); 
 	
-	private static final int LAST_ACTIONS_PRESERVED_COUNT = 10;
-	
 	private static HashMap<String, WorkingFile> workingFiles = new LinkedHashMap<String, WorkingFile>();
-	private static List<EclipseAction> lastActions = new ArrayList<EclipseAction>();
+	private static ActionsCache recentActions = new ActionsCache();
 	
 	public static void init() {
 		loggers.add(dbLogger);
@@ -62,6 +62,7 @@ public class EclipseActionMonitor {
 			final ConsoleActionLogger logger = new ConsoleActionLogger();
 			loggers.add(logger);
 		}
+		
 	}
 	
 	public static void setActualFile(final IFile file) {
@@ -139,7 +140,9 @@ public class EclipseActionMonitor {
 		}
 		
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
-		final CloseFileAction closeAction = new CloseFileAction(timeSinceLastAction, lastAction, file, previous, closed);
+		final String lastActions = recentActions.getLastActionsForEclipseAction();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.CLOSE_FILE).size();
+		final CloseFileAction closeAction = new CloseFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previous, closed);
 		logEclipseAction(closeAction, DEFAULT_CONTEXT);
 		afterAction(closeAction);
 	}
@@ -148,7 +151,10 @@ public class EclipseActionMonitor {
 		setActualFile(file);
 		
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
-		final OpenNewFileAction openAction = new OpenNewFileAction(timeSinceLastAction, lastAction, file, previousFile);
+		final String lastActions = recentActions.getLastActionsForEclipseAction();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.OPEN_FILE).size();
+		
+		final OpenNewFileAction openAction = new OpenNewFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previousFile);
 		logEclipseAction(openAction, DEFAULT_CONTEXT);
 		afterAction(openAction); // TODO check if needed 
 	}
@@ -157,42 +163,60 @@ public class EclipseActionMonitor {
 		setActualFile(file);
 		
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
-		final SwitchToFileAction switchAction = new SwitchToFileAction(timeSinceLastAction, lastAction, file, previousFile);
+		final String lastActions = recentActions.getLastActionsForEclipseAction();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.SWITCH_FILE).size();
+		
+		final SwitchToFileAction switchAction = new SwitchToFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previousFile);
 		logEclipseAction(switchAction, DEFAULT_CONTEXT);
 		afterAction(switchAction);
 	}
 	
 	public static void refactorPackage(final IFolder oldPack, final IFolder newPack) {
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
-		final RefactorPackageAction refPackAction = new RefactorPackageAction(timeSinceLastAction, lastAction, oldPack, newPack, previousFile);
+		final String lastActions = recentActions.getLastActionsForEclipseAction();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.SWITCH_FILE).size();
+		
+		final RefactorPackageAction refPackAction = new RefactorPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldPack, newPack, previousFile);
 		logEclipseAction(refPackAction, DEFAULT_CONTEXT);
 		afterAction(refPackAction);
 	}
 	
 	public static void refactorFile(final IFile oldFile, final IFile newFile) {
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
-		final RefactorFileAction refFileAction = new RefactorFileAction(timeSinceLastAction, lastAction, oldFile, newFile, previousFile);
+		final String lastActions = recentActions.getLastActionsForEclipseAction();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.REFACTOR_FILE).size();
+		
+		final RefactorFileAction refFileAction = new RefactorFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldFile, newFile, previousFile);
 		logEclipseAction(refFileAction, DEFAULT_CONTEXT);
 		afterAction(refFileAction);
 	}
 	
 	public static void addFolder(final IFolder folder) {
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
-		final AddPackageAction action = new AddPackageAction(timeSinceLastAction, lastAction, folder, actualFile);
+		final String lastActions = recentActions.getLastActionsForEclipseAction();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.ADD_PACKAGE).size();
+		
+		final AddPackageAction action = new AddPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, folder, actualFile);
 		logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
 	}
 	
 	public static void deleteFolder(final IFolder folder) {
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
-		final DeletePackageAction action = new DeletePackageAction(timeSinceLastAction, lastAction, folder, actualFile);
+		final String lastActions = recentActions.getLastActionsForEclipseAction();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.DELETE_FILE).size();
+		
+		final DeletePackageAction action = new DeletePackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, folder, actualFile);
 		logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
 	}
 	
 	public static void addFile(final IFile file) {
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
-		final AddFileAction action = new AddFileAction(timeSinceLastAction, lastAction, file, actualFile);
+		final String lastActions = recentActions.getLastActionsForEclipseAction();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.ADD_FILE).size();
+		
+		final AddFileAction action = new AddFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, actualFile);
 		logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
 	}
@@ -205,8 +229,11 @@ public class EclipseActionMonitor {
 			previous = actualFile;
 		}
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
+		final String lastActions = recentActions.getLastActionsForEclipseAction();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.DELETE_FILE).size();
+		
 		final WorkingFile deleted = workingFiles.remove(file.getProjectRelativePath().toOSString());
-		final DeleteFileAction deleteFileAction = new DeleteFileAction(timeSinceLastAction, lastAction, file, previous, deleted);
+		final DeleteFileAction deleteFileAction = new DeleteFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previous, deleted);
 		logEclipseAction(deleteFileAction, DEFAULT_CONTEXT);
 		afterAction(deleteFileAction);
 	}
@@ -214,7 +241,10 @@ public class EclipseActionMonitor {
 
 	public static void addProject(final IProject project) {
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
-		final AddProjectAction action = new AddProjectAction(timeSinceLastAction, lastAction, project);
+		final String lastActions = recentActions.getLastActionsForEclipseAction();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.ADD_PROJECT).size();
+		
+		final AddProjectAction action = new AddProjectAction(timeSinceLastAction, lastAction, lastActions, recentCount, project);
 		logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
 	}
@@ -222,6 +252,7 @@ public class EclipseActionMonitor {
 	private static void afterAction(final EclipseAction action) {
 		lastAction = action;
 		lastActionTime = System.currentTimeMillis();
+		recentActions.addEclipseActionToChache(action);
 	}
 	
 	public static void logEclipseAction(final EclipseAction action, final boolean contextChange) {

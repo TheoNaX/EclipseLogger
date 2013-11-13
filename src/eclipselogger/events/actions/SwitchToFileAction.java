@@ -21,8 +21,8 @@ public class SwitchToFileAction extends EclipseAction {
 	private final boolean sameFileType;
 	
 	
-	public SwitchToFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile openedFile, final IFile previousFile) {
-		super(timeSinceLastAction, previousAction);
+	public SwitchToFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IFile openedFile, final IFile previousFile) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
 		this.switchedToFile = openedFile.getProjectRelativePath().toOSString();
 		if (previousFile != null) {
 			this.previousFile = previousFile.getProjectRelativePath().toOSString();

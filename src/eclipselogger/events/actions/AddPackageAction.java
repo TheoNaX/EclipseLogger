@@ -19,8 +19,8 @@ public class AddPackageAction extends EclipseAction {
 	private final boolean samePackage;
 	private final boolean sameProject;
 	
-	public AddPackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFolder addedPackage, final IFile previousFile) {
-		super(timeSinceLastAction, previousAction);
+	public AddPackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IFolder addedPackage, final IFile previousFile) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
 		this.addedPackage = addedPackage.getProjectRelativePath().toOSString();
 		if (previousFile != null) {
 			this.previousFile = previousFile.getProjectRelativePath().toOSString();

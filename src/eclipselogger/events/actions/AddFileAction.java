@@ -20,10 +20,12 @@ public class AddFileAction extends EclipseAction {
 	private final boolean samePackage;
 	private final boolean sameProject;
 	private final boolean sameFileType;
+	private int recentAddFileActionsCount;
 	
 	
-	public AddFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile addedFile, final IFile previousFile) {
-		super(timeSinceLastAction, previousAction);
+	public AddFileAction(final long timeSinceLastAction, final EclipseAction previousAction, 
+			final String recentActions, final int recentSameActionsCount, final IFile addedFile, final IFile previousFile) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
 		this.addedFile = addedFile.getProjectRelativePath().toOSString();
 		if (previousFile != null) {
 			this.previousFile = previousFile.getProjectRelativePath().toOSString();
@@ -65,6 +67,10 @@ public class AddFileAction extends EclipseAction {
 	
 	public boolean isSameFileType() {
 		return this.sameFileType;
+	}
+	
+	public int getRecentAddFileActionsCount() {
+		return this.recentAddFileActionsCount;
 	}
 	
 	public static DynamicQuery createQuery() {

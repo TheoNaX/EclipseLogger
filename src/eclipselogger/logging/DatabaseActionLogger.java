@@ -1,5 +1,6 @@
 package eclipselogger.logging;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 
 import org.apache.log4j.Logger;
@@ -345,7 +346,7 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 	}
 	
 	private void insertEclipseActionIntoDb(final EclipseAction action, final boolean context) throws Exception {
-		final String sql = "INSERT INTO eclipse_action(last_action, time_since_last, action, context_change, send_status) VALUES (?, ?, ?, ?, ?)";
+		final String sql = "INSERT INTO eclipse_action(last_action, time_since_last, action, context_change, last_actions, recent_same_actions_count, send_status, time_stamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 		PreparedStatement ps = null;
 		try {
 			ps = this.dbHandler.prepareStatement(sql);
@@ -353,7 +354,11 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.setLong(2, action.getTimeSinceLastAction());
 			ps.setInt(3, action.getActionType().getValue());
 			ps.setBoolean(4, context);
-			ps.setInt(5, EclipseAction.SEND_STATUS_UNSENT);
+			ps.setString(5, action.getRecentActions());
+			ps.setInt(6, action.getRecentSameActionsCount());
+			ps.setInt(7, EclipseAction.SEND_STATUS_UNSENT);
+			final Date timestamp = new Date(action.getTimestamp().getTime());
+			ps.setDate(8, timestamp);
 			
 			ps.executeUpdate();
 		}

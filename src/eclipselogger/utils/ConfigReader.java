@@ -8,11 +8,29 @@ import java.util.Properties;
 
 public class ConfigReader {
 	
-	public static final String SFTP_FILE_DIRECTORY = "SFTP_FILE_DIRECTORY";
-	public static final String LOCAL_FILE_DIRECTORY = "LOCAL_FILE_DIRECTORY";
+	public static final String DB_NAME = "DB_NAME";
+	
+	
 	public static final String FILE_UPLOADER_TYPE = "FILE_UPLOADER_TYPE";
 	public static final String FILE_SEND_INTERVAL = "FILE_SEND_INTERVAL";
 	public static final String LOGGER_TYPES = "LOGGER_TYPES";
+	
+	// SFTP specific
+	public static final String SFTP_SERVER_IP = "SFTP_SERVER_IP";
+	public static final String SFTP_SERVER_PORT = "SFTP_SERVER_PORT";
+	public static final String SFTP_USER_NAME = "SFTP_USER_NAME";
+	public static final String SFTP_PASSWORD = "SFTP_PASSWORD";
+	public static final String SFTP_TARGET_DIRECTORY = "SFTP_TARGET_DIRECTORY";
+	
+	// REST specific 
+	// TODO
+	
+	// local store specific
+	public static final String LOCAL_FILE_DIRECTORY = "LOCAL_FILE_DIRECTORY";
+	
+	// action properties
+	public static final String RECENT_SAME_TYPE_INTERVAL = "RECENT_SAME_TYPE_INTERVAL";
+	public static final String RECENT_ACTIONS_COUNT = "RECENT_ACTIONS_COUNT";
 	
 	private static Properties properties;
 	
@@ -28,7 +46,7 @@ public class ConfigReader {
 	}
 	
 	public static String getSftpFileTargetDirectory() {
-		return properties.getProperty(SFTP_FILE_DIRECTORY, "/var/tmp");
+		return properties.getProperty(SFTP_TARGET_DIRECTORY, "/var/tmp");
 	}
 	
 	public static String getLocalFileTargetDirectory() {
@@ -36,7 +54,7 @@ public class ConfigReader {
 	}
 	
 	public static String getFileUploaderType() {
-		return properties.getProperty(FILE_UPLOADER_TYPE, "SFTPActionUploader");
+		return properties.getProperty(FILE_UPLOADER_TYPE, "SFTP");
 	}
 	
 	public static int getFilesSendIntervalSeconds() {
@@ -53,6 +71,45 @@ public class ConfigReader {
 		}
 		
 		return loggers;
+	}
+	
+	public static String getSftpServerIPAddress() {
+		return properties.getProperty(SFTP_SERVER_IP);
+	}
+	
+	public static int getSftpServerPort() {
+		final String portValue = properties.getProperty(SFTP_SERVER_PORT);
+		return (portValue != null) ? Integer.parseInt(portValue) : 22;
+	}
+	
+	public static String getSftpTargetDir() {
+		return properties.getProperty(SFTP_TARGET_DIRECTORY, "");
+	}
+
+	public static String getSftpUserName() {
+		return properties.getProperty(SFTP_USER_NAME);
+	}
+
+	public static String getSftpPassword() {
+		return properties.getProperty(SFTP_PASSWORD);
+	}
+	
+	public static int getRecentSameTypeActionsCountInterval() {
+		final String strValue = properties.getProperty(RECENT_SAME_TYPE_INTERVAL, "300");
+		return Integer.parseInt(strValue);
+	}
+	
+	public static int getCountOfLastActions() {
+		final String strValue = properties.getProperty(RECENT_ACTIONS_COUNT, "20");
+		return Integer.parseInt(strValue);
+	}
+	
+	public static String getDbName() {
+		return properties.getProperty(DB_NAME, "eclipselog.db");
+	}
+	
+	public static Properties getProperties() {
+		return properties;
 	}
 	
 }

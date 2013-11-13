@@ -7,13 +7,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.apache.log4j.Logger;
+
 import eclipselogger.events.actions.EclipseAction;
+import eclipselogger.utils.ConfigReader;
 
 
 public class SQLiteHandler {
+	
+	private static Logger logger = Logger.getLogger(SQLiteHandler.class);
 	private final String sDriverName = "org.sqlite.JDBC";
 	
-	private final String dbName = "eclipselog.db";
+	private final String dbName = ConfigReader.getDbName();
 	private final String sJdbc = "jdbc:sqlite";
 	private final String dbUrl = this.sJdbc + ":" + this.dbName;
 	
@@ -23,7 +28,7 @@ public class SQLiteHandler {
 		Class.forName(this.sDriverName);
 		this.conn = DriverManager.getConnection(this.dbUrl);
 		this.conn.setAutoCommit(true);
-		System.out.println(">>>>>>>>>>>>> Connection to database established !!!");
+		logger.info(">>>>>>>>>>>>> Connection to database established !!!");
 	}
 	
 	private void checkConnection() throws Exception {
@@ -69,7 +74,7 @@ public class SQLiteHandler {
 			seqNo = rs.getInt(1) + 1;
 			return seqNo;
 		} else {
-			System.out.println(">>>>>>>> Resultset empty, returning 1 !!!");
+			logger.debug(">>>>>>>> Resultset empty, returning 1 !!!");
 			return 1;
 		}
 		

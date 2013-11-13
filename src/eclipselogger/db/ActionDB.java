@@ -10,6 +10,8 @@ public class ActionDB {
 	public static final String ACTION_TYPE = "action";
 	public static final String CONTEXT = "context_change";
 	public static final String TIMESTAMP = "time_stamp";
+	public static final String RECENT_ACTIONS = "last_actions";
+	public static final String RECENT_SAME_ACTIONS_COUNT = "recent_same_actions_count";
 	
 	// add file
 	public static final String SAME_PACKAGE = "same_package";
@@ -31,6 +33,7 @@ public class ActionDB {
 	public static final String LINES_CHANGED = "changed_lines";
 	public static final String WORK_TIME = "work_time";
 	
+	
 	// delete file
 	public static final String DELETED_FILE = "deleted_file";
 	
@@ -43,12 +46,17 @@ public class ActionDB {
 	// refactor file
 	public static final String REFACTORED_FILE = "refactored_file";
 	public static final String REFACTOR_TYPE = "refactor_type";
+	public static final String REFACTOR_OLD_FILE = "old_file_path";
+	public static final String REFACTOR_NEW_FILE = "new_file_path";
 	
 	// refactor package
 	public static final String REFACTORED_PACKAGE = "refactored_package";
+	public static final String REFACTOR_OLD_PACKAGE = "old_package_path";
+	public static final String REFACTOR_NEW_PACKAGE = "new_package_path";
 	
 	// switch file
 	public static final String SWITCHED_FILE = "switched_file";
+	
 	
 	// common
 	public static final String ACTION_ID = "action_id";

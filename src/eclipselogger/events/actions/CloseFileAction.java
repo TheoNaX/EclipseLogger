@@ -24,8 +24,8 @@ public class CloseFileAction extends EclipseAction {
 	private FileChanges fileChanges = new FileChanges();
 	private long workingTime = 0;
 	
-	public CloseFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile closedFile, final IFile previousFile, final WorkingFile workFile) {
-		super(timeSinceLastAction, previousAction);
+	public CloseFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IFile closedFile, final IFile previousFile, final WorkingFile workFile) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
 		this.closedFile = closedFile.getProjectRelativePath().toOSString();
 		if (previousFile != null) {
 			this.previousFile = previousFile.getProjectRelativePath().toOSString();

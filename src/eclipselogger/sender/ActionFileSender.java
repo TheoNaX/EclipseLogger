@@ -20,26 +20,26 @@ public class ActionFileSender implements Runnable {
 	
 	private boolean shouldStop = false;
 	
-	private final int SEND_INTERVAL = 1 * 60 * 1000; // 10 minutes
+	private final int SEND_INTERVAL = ConfigReader.getFilesSendIntervalSeconds() * 1000; // default 5 minutes
 
 	private final ActionLoader dbActionLoader = new ActionLoader();
 	// private final ActionUploaderIF sender = new RESTActionUploader();
 	private final ActionUploaderIF sender;
 	private final ActionFormatterIF formatter = new XMLActionFormatter();
 	
-	public ActionFileSender() {
+	public ActionFileSender() throws Exception {
 		this.sender = createSender();
 		this.runner = new Thread(this, "ACTION_FILE_SENDER");
 		this.runner.start();
 	}
 	
-	private static ActionUploaderIF createSender() {
+	private static ActionUploaderIF createSender() throws Exception {
 		ActionUploaderIF sender = null;
-		if (ConfigReader.getFileUploaderType().equals(ActionUploaderIF.SFTP_SENDER)) {
+		if (ConfigReader.getFileUploaderType().equalsIgnoreCase(ActionUploaderIF.SFTP_SENDER)) {
 			sender = new SFTPActionUploader();
-		} else if (ConfigReader.getFileUploaderType().equals(ActionUploaderIF.LOCAL_SENDER)) {
+		} else if (ConfigReader.getFileUploaderType().equalsIgnoreCase(ActionUploaderIF.LOCAL_SENDER)) {
 			sender = new DummyLocalUploader();
-		} else if (ConfigReader.getFileUploaderType().equals(ActionUploaderIF.REST_SENDER)) {
+		} else if (ConfigReader.getFileUploaderType().equalsIgnoreCase(ActionUploaderIF.REST_SENDER)) {
 			sender = new RESTActionUploader();
 		}
 		

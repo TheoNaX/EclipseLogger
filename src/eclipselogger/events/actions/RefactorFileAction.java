@@ -16,8 +16,8 @@ public class RefactorFileAction extends EclipseAction {
 	public static final String FILE_RENAME = "FILE_RENAME";
 	public static final String FILE_MOVE = "FILE_MOVE";
 	
-	private String oldFilePath;
-	private String newFilePath;
+	private final String oldFilePath;
+	private final String newFilePath;
 	private final String refactorType;
 	private final boolean samePackage;
 	private final boolean sameProject;
@@ -25,8 +25,8 @@ public class RefactorFileAction extends EclipseAction {
 	private final String refactoredFile;
 		
 	
-	public RefactorFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFile oldFile, final IFile newFile, final IFile previousFile) {
-		super(timeSinceLastAction, previousAction);
+	public RefactorFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IFile oldFile, final IFile newFile, final IFile previousFile) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
 		this.oldFilePath = oldFile.getProjectRelativePath().toOSString();
 		this.newFilePath = newFile.getProjectRelativePath().toOSString();
 		this.refactorType = resolveRefactorType(oldFile, newFile);
@@ -45,6 +45,8 @@ public class RefactorFileAction extends EclipseAction {
 		this.sameProject = rs.getBoolean(ActionDB.SAME_PROJECT);
 		this.refactorType = rs.getString(ActionDB.REFACTOR_TYPE);
 		this.refactoredFile = rs.getString(ActionDB.REFACTORED_FILE);
+		this.oldFilePath = rs.getString(ActionDB.REFACTOR_OLD_FILE);
+		this.newFilePath = rs.getString(ActionDB.REFACTOR_NEW_FILE);
 	}
 
 	public String getOldFilePath() {
@@ -106,6 +108,8 @@ public class RefactorFileAction extends EclipseAction {
 		query.addColumnToSelect(ActionDB.REFACTOR_TYPE);
 		query.addColumnToSelect(ActionDB.REFACTORED_FILE);
 		query.addColumnToSelect(ActionDB.PREVIOUS_FILE);
+		query.addColumnToSelect(ActionDB.REFACTOR_NEW_FILE);
+		query.addColumnToSelect(ActionDB.REFACTOR_OLD_FILE);
 		
 		query.setJoinColumn(ActionDB.ACTION_ID);
 		query.setJoinColumnForJoinedTable(ActionDB.ECLIPSE_ACTION_ID);

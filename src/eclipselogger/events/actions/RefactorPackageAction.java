@@ -22,6 +22,8 @@ public class RefactorPackageAction extends EclipseAction {
 	private final boolean sameProject;
 	private String previousFile;
 	private String refactoredPackage;
+	private final String oldPackagePath;
+	private final String newPackagePath;
 	
 	public boolean isSamePackage() {
 		return this.samePackage;
@@ -31,14 +33,16 @@ public class RefactorPackageAction extends EclipseAction {
 		return this.sameProject;
 	}
 
-	public RefactorPackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final IFolder oldPackage, final IFolder newPackage, final IFile previousFile) {
-		super(timeSinceLastAction, previousAction);
+	public RefactorPackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IFolder oldPackage, final IFolder newPackage, final IFile previousFile) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
 		this.refactorType = resolveRefactorType(oldPackage, newPackage);
 		if (previousFile != null) {
 			this.previousFile = previousFile.getProjectRelativePath().toOSString();
 		}
 		this.samePackage = PackageUtils.checkIfSamePackage(oldPackage, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(oldPackage, previousFile);
+		this.oldPackagePath = oldPackage.getProjectRelativePath().toOSString();
+		this.newPackagePath = newPackage.getProjectRelativePath().toOSString();
 	}
 	
 	public RefactorPackageAction(final ResultSet rs) throws SQLException {
@@ -48,6 +52,8 @@ public class RefactorPackageAction extends EclipseAction {
 		this.sameProject = rs.getBoolean(ActionDB.SAME_PROJECT);
 		this.refactorType = rs.getString(ActionDB.REFACTOR_TYPE);
 		this.refactoredPackage = rs.getString(ActionDB.REFACTORED_PACKAGE);
+		this.oldPackagePath = rs.getString(ActionDB.REFACTOR_OLD_PACKAGE);
+		this.newPackagePath = rs.getString(ActionDB.REFACTOR_NEW_PACKAGE);
 	}
 
 	public String getRefactorType() {
@@ -93,6 +99,8 @@ public class RefactorPackageAction extends EclipseAction {
 		query.addColumnToSelect(ActionDB.REFACTOR_TYPE);
 		query.addColumnToSelect(ActionDB.REFACTORED_PACKAGE);
 		query.addColumnToSelect(ActionDB.PREVIOUS_FILE);
+		query.addColumnToSelect(ActionDB.REFACTOR_NEW_PACKAGE);
+		query.addColumnToSelect(ActionDB.REFACTOR_OLD_PACKAGE);
 		
 		query.setJoinColumn(ActionDB.ACTION_ID);
 		query.setJoinColumnForJoinedTable(ActionDB.ECLIPSE_ACTION_ID);
