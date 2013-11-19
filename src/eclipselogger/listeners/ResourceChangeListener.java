@@ -18,7 +18,9 @@ public class ResourceChangeListener implements IResourceChangeListener {
 		try {
 			switch (event.getType()) {
 			case IResourceChangeEvent.POST_CHANGE:
-				this.logger.info("Resource changed: " + res.getProjectRelativePath().toOSString());
+				if (res != null) {
+					this.logger.info("Resource changed: " + res.getProjectRelativePath().toOSString());
+				}
 				this.handler.startDeltaHandling();
 				event.getDelta().accept(this.handler);
 				this.handler.stopDeltaHandling();

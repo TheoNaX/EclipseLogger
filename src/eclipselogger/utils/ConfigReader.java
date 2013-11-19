@@ -42,7 +42,9 @@ public class ConfigReader {
 		properties = new Properties();
 		try {
 			properties.load(new FileInputStream("config.properties"));
-		} catch (final Exception ignore) {} // we ignore this exception as default values are provided if load fails
+		} catch (final Exception ignore) {
+			ignore.printStackTrace();
+		} // we ignore this exception as default values are provided if load fails
 	}
 	
 	public static String getSftpFileTargetDirectory() {
@@ -50,7 +52,7 @@ public class ConfigReader {
 	}
 	
 	public static String getLocalFileTargetDirectory() {
-		return properties.getProperty(LOCAL_FILE_DIRECTORY, "actionfiles/");
+		return properties.getProperty(LOCAL_FILE_DIRECTORY, "c:\\eclipselog\\");
 	}
 	
 	public static String getFileUploaderType() {

@@ -8,6 +8,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.widgets.Display;
 
 import eclipselogger.events.actions.ActionType;
 import eclipselogger.events.actions.AddFileAction;
@@ -21,6 +22,7 @@ import eclipselogger.events.actions.OpenNewFileAction;
 import eclipselogger.events.actions.RefactorFileAction;
 import eclipselogger.events.actions.RefactorPackageAction;
 import eclipselogger.events.actions.SwitchToFileAction;
+import eclipselogger.gui.ContextChangeDialog;
 import eclipselogger.logging.ConsoleActionLogger;
 import eclipselogger.logging.DatabaseActionLogger;
 import eclipselogger.logging.EclipseActiontLogIF;
@@ -44,6 +46,8 @@ public class EclipseActionMonitor {
 	// loggers
 	private static EclipseActiontLogIF dbLogger = new DatabaseActionLogger();
 	
+	private static ContextChangeDialog contextDialog;
+	
 	
 	private static final List<EclipseActiontLogIF> loggers = new ArrayList<EclipseActiontLogIF>();
 	
@@ -58,7 +62,7 @@ public class EclipseActionMonitor {
 			final EclipseActiontLogIF log4jlogger = new Log4jActionLogger();
 			loggers.add(log4jlogger);
 		}
-		if (ConfigReader.getLoggers().contains(EclipseActiontLogIF.LOG4J_LOGGER)) {
+		if (ConfigReader.getLoggers().contains(EclipseActiontLogIF.CONSOLE_LOGGER)) {
 			final ConsoleActionLogger logger = new ConsoleActionLogger();
 			loggers.add(logger);
 		}
@@ -98,7 +102,6 @@ public class EclipseActionMonitor {
 	}
 	
 	private static void checkWorkingFileAndAddIfNotInWorking(final IFile file) {
-		// TODO really use project relative? If more projects with the same packages? 
 		fileWorkStart = System.currentTimeMillis();
 		if (!workingFiles.containsKey(file.getProjectRelativePath().toOSString())) {
 			final WorkingFile workFile = new WorkingFile(file);
@@ -114,15 +117,12 @@ public class EclipseActionMonitor {
 			final long workTime = stopWork - fileWorkStart;
 			final WorkingFile workFile = workingFiles.get(actualFile.getProjectRelativePath().toOSString());
 			if (workFile != null) {
-				System.out.println("Update file: Working file is not null, increasing working time");
 				workFile.increaseWorkingTime(workTime);
 				
-				System.out.println(">>>>> Resolving file changes ...");
 				final String fileContent = FileUtilities.fileContentToString(actualFile);
 				final FileChanges changes = FileComparator.getFileChanges(fileContentCache.getActualFileText(), fileContent);
 				
 				if (changes != null) {
-					System.out.println(">>>> Updating file changes: " + changes);
 					workFile.getFileChanges().updateFileChanges(changes);
 				}
 				
@@ -139,23 +139,40 @@ public class EclipseActionMonitor {
 			previous = getActualFile();
 		}
 		
+		// if last action was delete file action and file equals opened file,
+		// close action should not be logged
+		// as file is closed automatically after it was deleted
+		if (lastAction.getActionType() == ActionType.DELETE_FILE
+				&& ((DeleteFileAction) lastAction).getDeletedFile().equals(file.getProjectRelativePath().toOSString())) {
+			return;
+		}
+
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.CLOSE_FILE).size();
 		final CloseFileAction closeAction = new CloseFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previous, closed);
-		logEclipseAction(closeAction, DEFAULT_CONTEXT);
+		showContextChangeDialog(closeAction);
+		//logEclipseAction(closeAction, DEFAULT_CONTEXT);
 		afterAction(closeAction);
 	}
 	
 	public static void openNewFile(final IFile file) {
 		setActualFile(file);
 		
+		// if last action was add file action and file equals opened file, action should not be logged
+		// as file is opened automatically after it was added
+		if (lastAction.getActionType() == ActionType.ADD_FILE && 
+				((AddFileAction)lastAction).getAddedFile().equals(file.getProjectRelativePath().toOSString())) {
+			return;
+		}
+		
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.OPEN_FILE).size();
 		
 		final OpenNewFileAction openAction = new OpenNewFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previousFile);
-		logEclipseAction(openAction, DEFAULT_CONTEXT);
+		showContextChangeDialog(openAction);
+		//logEclipseAction(openAction, DEFAULT_CONTEXT);
 		afterAction(openAction); // TODO check if needed 
 	}
 	
@@ -167,7 +184,8 @@ public class EclipseActionMonitor {
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.SWITCH_FILE).size();
 		
 		final SwitchToFileAction switchAction = new SwitchToFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previousFile);
-		logEclipseAction(switchAction, DEFAULT_CONTEXT);
+		//logEclipseAction(switchAction, DEFAULT_CONTEXT);
+		showContextChangeDialog(switchAction);
 		afterAction(switchAction);
 	}
 	
@@ -177,7 +195,8 @@ public class EclipseActionMonitor {
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.SWITCH_FILE).size();
 		
 		final RefactorPackageAction refPackAction = new RefactorPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldPack, newPack, previousFile);
-		logEclipseAction(refPackAction, DEFAULT_CONTEXT);
+		showContextChangeDialog(refPackAction);
+		//logEclipseAction(refPackAction, DEFAULT_CONTEXT);
 		afterAction(refPackAction);
 	}
 	
@@ -187,7 +206,8 @@ public class EclipseActionMonitor {
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.REFACTOR_FILE).size();
 		
 		final RefactorFileAction refFileAction = new RefactorFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldFile, newFile, previousFile);
-		logEclipseAction(refFileAction, DEFAULT_CONTEXT);
+		showContextChangeDialog(refFileAction);
+		//logEclipseAction(refFileAction, DEFAULT_CONTEXT);
 		afterAction(refFileAction);
 	}
 	
@@ -197,7 +217,8 @@ public class EclipseActionMonitor {
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.ADD_PACKAGE).size();
 		
 		final AddPackageAction action = new AddPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, folder, actualFile);
-		logEclipseAction(action, DEFAULT_CONTEXT);
+		showContextChangeDialog(action);
+		//logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
 	}
 	
@@ -207,7 +228,8 @@ public class EclipseActionMonitor {
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.DELETE_FILE).size();
 		
 		final DeletePackageAction action = new DeletePackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, folder, actualFile);
-		logEclipseAction(action, DEFAULT_CONTEXT);
+		showContextChangeDialog(action);
+		//logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
 	}
 	
@@ -217,7 +239,8 @@ public class EclipseActionMonitor {
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.ADD_FILE).size();
 		
 		final AddFileAction action = new AddFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, actualFile);
-		logEclipseAction(action, DEFAULT_CONTEXT);
+		showContextChangeDialog(action);
+		//logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
 	}
 	
@@ -234,7 +257,8 @@ public class EclipseActionMonitor {
 		
 		final WorkingFile deleted = workingFiles.remove(file.getProjectRelativePath().toOSString());
 		final DeleteFileAction deleteFileAction = new DeleteFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previous, deleted);
-		logEclipseAction(deleteFileAction, DEFAULT_CONTEXT);
+		showContextChangeDialog(deleteFileAction);
+		//logEclipseAction(deleteFileAction, DEFAULT_CONTEXT);
 		afterAction(deleteFileAction);
 	}
 	
@@ -245,7 +269,8 @@ public class EclipseActionMonitor {
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.ADD_PROJECT).size();
 		
 		final AddProjectAction action = new AddProjectAction(timeSinceLastAction, lastAction, lastActions, recentCount, project);
-		logEclipseAction(action, DEFAULT_CONTEXT);
+		//logEclipseAction(action, DEFAULT_CONTEXT);
+		showContextChangeDialog(action);
 		afterAction(action);
 	}
 	
@@ -261,6 +286,26 @@ public class EclipseActionMonitor {
 		}
 	}
 	
+//	public static void initContextDialog(final ContextChangeDialog dialog) {
+//		contextDialog = dialog;
+//	}
 	
+	private static void showContextChangeDialog(final EclipseAction action) {
+		//final Shell parentShell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		Display.getDefault().asyncExec(new Runnable() {
+		    @Override
+			public void run() {
+		    	if (contextDialog != null) {
+					contextDialog.close();
+				}
+		    	
+		    	contextDialog = new ContextChangeDialog(null);
+				contextDialog.setActualAction(action);
+				contextDialog.open();
+				contextDialog.refreshActionDetails();
+		    }
+		});
+		
+	}
 	
 }

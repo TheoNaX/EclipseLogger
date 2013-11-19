@@ -5,7 +5,6 @@ import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.internal.Workbench;
@@ -48,36 +47,41 @@ public class LoggingView extends ViewPart {
     // create thread, which is sending Eclipse actions periodically to server
     private ActionFileSender fileSender; 
     
-    @Override
+	@Override
 	public void createPartControl(final Composite parent) {
-       this.label = new Label(parent, SWT.WRAP);
-       this.label.setText("Hello World");
-       Workbench.getInstance().getActiveWorkbenchWindow().getPartService().addPartListener(this.listener);
-       ResourcesPlugin.getWorkspace().addResourceChangeListener(this.resourceListener,
-    	       IResourceChangeEvent.POST_CHANGE);
+		
+		// init Log4J logger
+		PropertyConfigurator.configure(ConfigReader.getProperties());
+		
+		Workbench.getInstance().getActiveWorkbenchWindow().getPartService().addPartListener(this.listener);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this.resourceListener,
+				IResourceChangeEvent.POST_CHANGE);
+		
+		// create file sender thread
 		try {
 			this.fileSender = new ActionFileSender();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-       
-       // init loggers for actions - see config.properties
-       EclipseActionMonitor.init();
-       
-       // TODO init log4j
-       PropertyConfigurator.configure(ConfigReader.getProperties());
-    }
-    
-    
-    @Override
+
+		// init loggers for actions - see config.properties
+		EclipseActionMonitor.init();
+
+		// init context change dialog
+//		final Shell shell = parent.getShell();
+//		final ContextChangeDialog dialog = new ContextChangeDialog(shell);
+//		EclipseActionMonitor.initContextDialog(dialog);
+	}
+
+	@Override
 	public void setFocus() {
-       // set focus to my widget.  For a label, this doesn't
-       // make much sense, but for more complex sets of widgets
-       // you would decide which one gets the focus.
-    }
-    
-    @Override
-    public void dispose() {
-    	this.fileSender.stopSenderThread();
-    }
+		// set focus to my widget. For a label, this doesn't
+		// make much sense, but for more complex sets of widgets
+		// you would decide which one gets the focus.
+	}
+
+	@Override
+	public void dispose() {
+		this.fileSender.stopSenderThread();
+	}
 }

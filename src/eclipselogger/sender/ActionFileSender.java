@@ -10,7 +10,7 @@ import eclipselogger.utils.ConfigReader;
 
 public class ActionFileSender implements Runnable {
 	
-	private final Logger logger = Logger.getLogger(ActionFileSender.class);
+	private final static Logger logger = Logger.getLogger(ActionFileSender.class);
 	
 	public static final int UNSENT = 1;
 	public static final int SENT = 2;
@@ -35,12 +35,19 @@ public class ActionFileSender implements Runnable {
 	
 	private static ActionUploaderIF createSender() throws Exception {
 		ActionUploaderIF sender = null;
-		if (ConfigReader.getFileUploaderType().equalsIgnoreCase(ActionUploaderIF.SFTP_SENDER)) {
+		logger.debug("Going to create sender...");
+		logger.debug("Configured sender type: " + ConfigReader.getFileUploaderType());
+		final String senderType = ConfigReader.getFileUploaderType();
+		if (senderType.equalsIgnoreCase(ActionUploaderIF.SFTP_SENDER)) {
 			sender = new SFTPActionUploader();
-		} else if (ConfigReader.getFileUploaderType().equalsIgnoreCase(ActionUploaderIF.LOCAL_SENDER)) {
+			logger.debug("SFTP sender created");
+		} else if (senderType.equalsIgnoreCase(ActionUploaderIF.LOCAL_SENDER)) {
+			logger.debug("Before local sender creating");
 			sender = new DummyLocalUploader();
-		} else if (ConfigReader.getFileUploaderType().equalsIgnoreCase(ActionUploaderIF.REST_SENDER)) {
+			logger.debug("Local sender created");
+		} else if (senderType.equalsIgnoreCase(ActionUploaderIF.REST_SENDER)) {
 			sender = new RESTActionUploader();
+			logger.debug("REST sender created");
 		}
 		
 		return sender;
@@ -72,17 +79,17 @@ public class ActionFileSender implements Runnable {
 				for (final EclipseAction action : unsentActions) {
 					final String formattedAction = this.formatter.formatEclipseAction(action);
 					try {
-						this.logger.info("Going to upload action " + action.getActionType() + ", ID: " + action.getActionId());
+						logger.info("Going to upload action " + action.getActionType() + ", ID: " + action.getActionId());
 						this.sender.uploadEclipseActionToServer(formattedAction);
 						this.dbActionLoader.updateActionSendStatus(action.getActionId(), SENT);
-						this.logger.info("Action uploaded successfully, ID: " + action.getActionId());
+						logger.info("Action uploaded successfully, ID: " + action.getActionId());
 					} catch (final Exception e) {
-						this.logger.error("Sending of action failed, ID: " + action.getActionId(), e);
+						logger.error("Sending of action failed, ID: " + action.getActionId(), e);
 					}
 				}
 			}
 		} catch (final Exception e) {
-			this.logger.error("Failed to load unsent actions", e);
+			logger.error("Failed to load unsent actions", e);
 		}
 	}
 	

@@ -89,6 +89,21 @@ public class XMLActionFormatter implements ActionFormatterIF {
 		sb.append("</timeSinceLastAction>");
 		sb.append("\n");
 		
+		sb.append("<recentActions>");
+		sb.append(action.getRecentActions());
+		sb.append("</recentActions>");
+		sb.append("\n");
+		
+		sb.append("<timestamp>");
+		sb.append(action.getTimestamp());
+		sb.append("</timestamp>");
+		sb.append("\n");
+		
+		sb.append("<sameRecentActionsCount>");
+		sb.append(action.getRecentSameActionsCount());
+		sb.append("</sameRecentActionsCount>");
+		sb.append("\n");
+		
 		sb.append("<contextChange>");
 		sb.append(action.getContextChange());
 		sb.append("</contextChange>");
