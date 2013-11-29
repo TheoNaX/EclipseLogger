@@ -14,6 +14,7 @@ import eclipselogger.events.EclipseActionMonitor;
 public class OpenFileListener implements IPartListener2 {
 	
 	private String lastOpened;
+	private String lastSwitched;
 	private final Logger logger = Logger.getLogger(OpenFileListener.class);
 
 	@Override
@@ -24,9 +25,11 @@ public class OpenFileListener implements IPartListener2 {
 			final IEditorInput input = editor.getEditorInput();
 			if (input instanceof IFileEditorInput) {
 				final IFile file = ((IFileEditorInput)input).getFile();
-				if (this.lastOpened == null || !this.lastOpened.equals(file.getProjectRelativePath().toOSString())) {
+				if ((this.lastOpened == null || !this.lastOpened.equals(file.getProjectRelativePath().toOSString()))
+						&& (this.lastSwitched == null || !this.lastSwitched.equals(file.getProjectRelativePath().toOSString()))) {
 					this.logger.info("Switched to file: " + file.getProjectRelativePath().toOSString());
 					EclipseActionMonitor.switchToFile(file);
+					this.lastSwitched = file.getProjectRelativePath().toOSString();
 				}
 			}
 			this.lastOpened = null;

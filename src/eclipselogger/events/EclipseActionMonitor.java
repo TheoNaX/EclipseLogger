@@ -8,6 +8,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.swt.widgets.Display;
 
 import eclipselogger.events.actions.ActionType;
@@ -33,6 +34,7 @@ import eclipselogger.utils.ConfigReader;
 import eclipselogger.utils.FileChanges;
 import eclipselogger.utils.FileComparator;
 import eclipselogger.utils.FileUtilities;
+import eclipselogger.utils.PackageDistanceCalculator;
 
 public class EclipseActionMonitor {
 	private static boolean DEFAULT_CONTEXT = false;
@@ -150,7 +152,9 @@ public class EclipseActionMonitor {
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.CLOSE_FILE).size();
-		final CloseFileAction closeAction = new CloseFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previous, closed);
+		final int packageDistance = getPackageDistance(file);
+		
+		final CloseFileAction closeAction = new CloseFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previous, closed, packageDistance);
 		showContextChangeDialog(closeAction);
 		//logEclipseAction(closeAction, DEFAULT_CONTEXT);
 		afterAction(closeAction);
@@ -170,7 +174,8 @@ public class EclipseActionMonitor {
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.OPEN_FILE).size();
 		
-		final OpenNewFileAction openAction = new OpenNewFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previousFile);
+		final int packageDistance = getPackageDistance(file);
+		final OpenNewFileAction openAction = new OpenNewFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previousFile, packageDistance);
 		showContextChangeDialog(openAction);
 		//logEclipseAction(openAction, DEFAULT_CONTEXT);
 		afterAction(openAction); // TODO check if needed 
@@ -183,7 +188,8 @@ public class EclipseActionMonitor {
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.SWITCH_FILE).size();
 		
-		final SwitchToFileAction switchAction = new SwitchToFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previousFile);
+		final int packageDistance = getPackageDistance(file);
+		final SwitchToFileAction switchAction = new SwitchToFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previousFile, packageDistance);
 		//logEclipseAction(switchAction, DEFAULT_CONTEXT);
 		showContextChangeDialog(switchAction);
 		afterAction(switchAction);
@@ -194,7 +200,8 @@ public class EclipseActionMonitor {
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.SWITCH_FILE).size();
 		
-		final RefactorPackageAction refPackAction = new RefactorPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldPack, newPack, previousFile);
+		final int packageDistance = getPackageDistance(oldPack);
+		final RefactorPackageAction refPackAction = new RefactorPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldPack, newPack, previousFile, packageDistance);
 		showContextChangeDialog(refPackAction);
 		//logEclipseAction(refPackAction, DEFAULT_CONTEXT);
 		afterAction(refPackAction);
@@ -205,7 +212,8 @@ public class EclipseActionMonitor {
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.REFACTOR_FILE).size();
 		
-		final RefactorFileAction refFileAction = new RefactorFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldFile, newFile, previousFile);
+		final int packageDistance = getPackageDistance(oldFile);
+		final RefactorFileAction refFileAction = new RefactorFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldFile, newFile, previousFile, packageDistance);
 		showContextChangeDialog(refFileAction);
 		//logEclipseAction(refFileAction, DEFAULT_CONTEXT);
 		afterAction(refFileAction);
@@ -216,7 +224,8 @@ public class EclipseActionMonitor {
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.ADD_PACKAGE).size();
 		
-		final AddPackageAction action = new AddPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, folder, actualFile);
+		final int packageDistance = getPackageDistance(folder);
+		final AddPackageAction action = new AddPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, folder, actualFile, packageDistance);
 		showContextChangeDialog(action);
 		//logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
@@ -227,7 +236,8 @@ public class EclipseActionMonitor {
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.DELETE_FILE).size();
 		
-		final DeletePackageAction action = new DeletePackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, folder, actualFile);
+		final int packageDistance = getPackageDistance(folder);
+		final DeletePackageAction action = new DeletePackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, folder, actualFile, packageDistance);
 		showContextChangeDialog(action);
 		//logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
@@ -238,7 +248,8 @@ public class EclipseActionMonitor {
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.ADD_FILE).size();
 		
-		final AddFileAction action = new AddFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, actualFile);
+		final int packageDistance = getPackageDistance(file);
+		final AddFileAction action = new AddFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, actualFile, packageDistance);
 		showContextChangeDialog(action);
 		//logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
@@ -256,7 +267,8 @@ public class EclipseActionMonitor {
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.DELETE_FILE).size();
 		
 		final WorkingFile deleted = workingFiles.remove(file.getProjectRelativePath().toOSString());
-		final DeleteFileAction deleteFileAction = new DeleteFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previous, deleted);
+		final int packageDistance = getPackageDistance(file);
+		final DeleteFileAction deleteFileAction = new DeleteFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previous, deleted, packageDistance);
 		showContextChangeDialog(deleteFileAction);
 		//logEclipseAction(deleteFileAction, DEFAULT_CONTEXT);
 		afterAction(deleteFileAction);
@@ -268,7 +280,7 @@ public class EclipseActionMonitor {
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
 		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.ADD_PROJECT).size();
 		
-		final AddProjectAction action = new AddProjectAction(timeSinceLastAction, lastAction, lastActions, recentCount, project);
+		final AddProjectAction action = new AddProjectAction(timeSinceLastAction, lastAction, lastActions, recentCount, project, 0);
 		//logEclipseAction(action, DEFAULT_CONTEXT);
 		showContextChangeDialog(action);
 		afterAction(action);
@@ -283,6 +295,14 @@ public class EclipseActionMonitor {
 	public static void logEclipseAction(final EclipseAction action, final boolean contextChange) {
 		for (final EclipseActiontLogIF logger : loggers) {
 			logger.logEclipseAction(action, contextChange);
+		}
+	}
+	
+	private static int getPackageDistance(final IResource res) {
+		if (lastAction == null || lastAction.getActionType() == ActionType.ADD_PROJECT) {
+			return 0;
+		} else {
+			return PackageDistanceCalculator.calculatePackageDistance(res, lastAction.getResource());
 		}
 	}
 	

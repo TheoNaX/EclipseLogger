@@ -20,8 +20,9 @@ public class OpenNewFileAction extends EclipseAction {
 	private final boolean sameProject;
 	private final boolean sameFileType;
 	
-	public OpenNewFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IFile openedFile, final IFile previousFile) {
-		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
+	public OpenNewFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
+			final int recentSameActionsCount, final IFile openedFile, final IFile previousFile, final int packageDistance) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.openedFile = openedFile.getProjectRelativePath().toOSString();
 		if (previousFile != null) {
 			this.previousFile = previousFile.getProjectRelativePath().toOSString();

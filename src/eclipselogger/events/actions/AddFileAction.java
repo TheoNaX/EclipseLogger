@@ -24,8 +24,8 @@ public class AddFileAction extends EclipseAction {
 	
 	
 	public AddFileAction(final long timeSinceLastAction, final EclipseAction previousAction, 
-			final String recentActions, final int recentSameActionsCount, final IFile addedFile, final IFile previousFile) {
-		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
+			final String recentActions, final int recentSameActionsCount, final IFile addedFile, final IFile previousFile, final int packageDistance) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.addedFile = addedFile.getProjectRelativePath().toOSString();
 		if (previousFile != null) {
 			this.previousFile = previousFile.getProjectRelativePath().toOSString();

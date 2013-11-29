@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
+import org.eclipse.core.resources.IResource;
+
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
 
@@ -17,17 +19,21 @@ public abstract class EclipseAction {
 	protected String recentActions;
 	protected int recentSameActionsCount;
 	
+	protected int packageDistanceFromLastAction;
+	protected IResource resource;
+	
 	public static final String TABLE_NAME = "eclipse_action";
 	
 	public static final int SEND_STATUS_UNSENT = 1;
 	public static final int SEND_STATUS_SENT = 2;
 	
-	public EclipseAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount) {
+	public EclipseAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final int packageDistance) {
 		this.timeSinceLastAction = timeSinceLastAction;
 		this.previousAction = (previousAction != null) ? previousAction.getActionType().getValue() : 0;
 		this.timestamp = new Date();
 		this.recentActions = recentActions;
 		this.recentSameActionsCount = recentSameActionsCount;
+		this.packageDistanceFromLastAction = packageDistance;
 	}
 	
 	public EclipseAction(final ResultSet rs) throws SQLException {
@@ -82,5 +88,17 @@ public abstract class EclipseAction {
 	
 	public Date getTimestamp() {
 		return this.timestamp;
+	}
+	
+	public IResource getResource() {
+		return this.resource;
+	}
+	
+	public void setResource(final IResource resource) {
+		this.resource = resource;
+	}
+	
+	public int getPackageDistance() {
+		return this.packageDistanceFromLastAction;
 	}
 }

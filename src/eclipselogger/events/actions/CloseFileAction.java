@@ -24,8 +24,9 @@ public class CloseFileAction extends EclipseAction {
 	private FileChanges fileChanges = new FileChanges();
 	private long workingTime = 0;
 	
-	public CloseFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IFile closedFile, final IFile previousFile, final WorkingFile workFile) {
-		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
+	public CloseFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
+			final int recentSameActionsCount, final IFile closedFile, final IFile previousFile, final WorkingFile workFile, final int packageDistance) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.closedFile = closedFile.getProjectRelativePath().toOSString();
 		if (previousFile != null) {
 			this.previousFile = previousFile.getProjectRelativePath().toOSString();
@@ -54,6 +55,7 @@ public class CloseFileAction extends EclipseAction {
 		return this.samePackage;
 	}
 	
+	@Override
 	public int getPackageDistance() {
 		// TODO implement package distances
 		return 0;

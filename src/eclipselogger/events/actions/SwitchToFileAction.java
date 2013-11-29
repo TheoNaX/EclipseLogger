@@ -21,8 +21,9 @@ public class SwitchToFileAction extends EclipseAction {
 	private final boolean sameFileType;
 	
 	
-	public SwitchToFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IFile openedFile, final IFile previousFile) {
-		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
+	public SwitchToFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
+			final int recentSameActionsCount, final IFile openedFile, final IFile previousFile, final int packageDistance) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.switchedToFile = openedFile.getProjectRelativePath().toOSString();
 		if (previousFile != null) {
 			this.previousFile = previousFile.getProjectRelativePath().toOSString();
@@ -45,6 +46,7 @@ public class SwitchToFileAction extends EclipseAction {
 		return this.samePackage;
 	}
 	
+	@Override
 	public int getPackageDistance() {
 		// TODO implement package distances
 		return 0;

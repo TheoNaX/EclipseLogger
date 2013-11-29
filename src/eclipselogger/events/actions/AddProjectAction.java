@@ -14,8 +14,9 @@ public class AddProjectAction extends EclipseAction {
 	
 	private final String projectName;
 	
-	public AddProjectAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IProject project) {
-		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
+	public AddProjectAction(final long timeSinceLastAction, final EclipseAction previousAction, 
+			final String recentActions, final int recentSameActionsCount, final IProject project, final int packageDistance) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.projectName = project.getName();
 	}
 	

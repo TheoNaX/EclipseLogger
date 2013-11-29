@@ -19,8 +19,9 @@ public class DeletePackageAction extends EclipseAction {
 	private final boolean samePackage;
 	private final boolean sameProject;	
 	
-	public DeletePackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IFolder deletedPackage, final IFile previousFile) {
-		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
+	public DeletePackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
+			final int recentSameActionsCount, final IFolder deletedPackage, final IFile previousFile, final int packageDistance) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.deletedPackage = deletedPackage.getProjectRelativePath().toOSString();
 		if (previousFile != null) {
 			this.previousFile = previousFile.getProjectRelativePath().toOSString();

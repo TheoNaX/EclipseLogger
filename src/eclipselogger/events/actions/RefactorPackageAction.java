@@ -33,8 +33,9 @@ public class RefactorPackageAction extends EclipseAction {
 		return this.sameProject;
 	}
 
-	public RefactorPackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IFolder oldPackage, final IFolder newPackage, final IFile previousFile) {
-		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
+	public RefactorPackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
+			final int recentSameActionsCount, final IFolder oldPackage, final IFolder newPackage, final IFile previousFile, final int packageDistance) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.refactorType = resolveRefactorType(oldPackage, newPackage);
 		if (previousFile != null) {
 			this.previousFile = previousFile.getProjectRelativePath().toOSString();

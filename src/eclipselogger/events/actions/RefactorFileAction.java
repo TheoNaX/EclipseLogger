@@ -25,8 +25,9 @@ public class RefactorFileAction extends EclipseAction {
 	private final String refactoredFile;
 		
 	
-	public RefactorFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final IFile oldFile, final IFile newFile, final IFile previousFile) {
-		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount);
+	public RefactorFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
+			final int recentSameActionsCount, final IFile oldFile, final IFile newFile, final IFile previousFile, final int packageDistance) {
+		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.oldFilePath = oldFile.getProjectRelativePath().toOSString();
 		this.newFilePath = newFile.getProjectRelativePath().toOSString();
 		this.refactorType = resolveRefactorType(oldFile, newFile);
