@@ -1,14 +1,22 @@
 package eclipselogger.utils;
 
+import java.io.File;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 
 public class PackageDistanceCalculator {
+	
+	
 	public static int calculatePackageDistance(final IResource first, final IResource second) {
 		final Vector<String> firstFoldersVector = getFoldersVector(first);
+		System.out.println(">>>> First resource: " + first.getProjectRelativePath().toOSString());
+		System.out.println(">>>>> First vector: " + firstFoldersVector);
 		final Vector<String> secondFoldersVector = getFoldersVector(second);
+		System.out.println(">>>> Second resource: " + second.getProjectRelativePath().toOSString());
+		System.out.println(">>>>> Second vector: " + secondFoldersVector);
 		final int firstLength = firstFoldersVector.size();
 		final int secondLength = secondFoldersVector.size();
 		
@@ -29,7 +37,7 @@ public class PackageDistanceCalculator {
 		} else {
 			path = res.getProjectRelativePath().toOSString();
 		}
-		final String[] folders = path.split("/");
+		final String[] folders = path.split(Pattern.quote(File.separator));
 		final Vector<String> result = new Vector<String>();
 		for (int i=0; i<folders.length; i++) {
 			result.add(folders[i]);
@@ -41,7 +49,7 @@ public class PackageDistanceCalculator {
 	public static Vector<String> getFoldersVector(final String res) {
 		final String path = res;
 		
-		final String[] folders = path.split("/");
+		final String[] folders = path.split(Pattern.quote(File.separator));
 		final Vector<String> result = new Vector<String>();
 		for (int i=0; i<folders.length; i++) {
 			result.add(folders[i]);
@@ -75,8 +83,8 @@ public class PackageDistanceCalculator {
 	
 	
 	public static void main(final String[] args) {
-		final String path1 = "src/eclipselogger/events/actions/lol/lala";
-		final String path2 = "src/eclipselogger/events/actions/lulu/lele";
+		final String path1 = "src\\eclipselogger\\events\\actions\\lol\\lala";
+		final String path2 = "src\\eclipselogger\\events\\actions\\lulu\\lele";
 		
 		final Vector<String> v1 = getFoldersVector(path1);
 		final Vector<String> v2 = getFoldersVector(path2);

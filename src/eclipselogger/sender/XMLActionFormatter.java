@@ -22,12 +22,13 @@ public class XMLActionFormatter implements ActionFormatterIF {
 		
 		xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		xml.append("\n");
-		xml.append("<eclipseAction>");
+		xml.append("<eclipseAction>\n");
 		xml.append("\n");
 		xml.append(commonParams);
 		xml.append("\n");
 		xml.append(actionParams);
 		
+		xml.append("\n");
 		xml.append("</eclipseAction>");
 		
 		return xml.toString();
@@ -85,7 +86,7 @@ public class XMLActionFormatter implements ActionFormatterIF {
 		sb.append("\n");
 		
 		sb.append("<timeSinceLastAction>");
-		sb.append(action.getPreviousAction());
+		sb.append(action.getTimeSinceLastAction());
 		sb.append("</timeSinceLastAction>");
 		sb.append("\n");
 		
@@ -107,6 +108,7 @@ public class XMLActionFormatter implements ActionFormatterIF {
 		sb.append("<contextChange>");
 		sb.append(action.getContextChange());
 		sb.append("</contextChange>");
+		sb.append("\n");
 		sb.append("\n");
 		
 		sb.append(formatContextSpecificParams(action));

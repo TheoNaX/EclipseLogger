@@ -43,7 +43,7 @@ public class ConfigReader {
 		try {
 			properties.load(new FileInputStream("config.properties"));
 		} catch (final Exception ignore) {
-			ignore.printStackTrace();
+			//ignore.printStackTrace();
 		} // we ignore this exception as default values are provided if load fails
 	}
 	

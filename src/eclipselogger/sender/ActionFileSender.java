@@ -80,7 +80,7 @@ public class ActionFileSender implements Runnable {
 					final String formattedAction = this.formatter.formatEclipseAction(action);
 					try {
 						logger.info("Going to upload action " + action.getActionType() + ", ID: " + action.getActionId());
-						this.sender.uploadEclipseActionToServer(formattedAction);
+						this.sender.uploadEclipseActionToServer(action.getActionId(), action.getTimestamp(), formattedAction);
 						this.dbActionLoader.updateActionSendStatus(action.getActionId(), SENT);
 						logger.info("Action uploaded successfully, ID: " + action.getActionId());
 					} catch (final Exception e) {

@@ -194,7 +194,7 @@ public class EclipseActionMonitor {
 		
 		// if last action was add file action and file equals opened file, action should not be logged
 		// as file is opened automatically after it was added
-		if (lastAction.getActionType() == ActionType.ADD_FILE && 
+		if (lastAction != null && lastAction.getActionType() == ActionType.ADD_FILE && 
 				((AddFileAction)lastAction).getAddedFile().equals(file.getProjectRelativePath().toOSString())) {
 			return;
 		}

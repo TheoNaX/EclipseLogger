@@ -9,7 +9,6 @@ import eclipselogger.utils.ConfigReader;
 
 public class DummyLocalUploader implements ActionUploaderIF {
 
-	private int counter = 0;
 	private final String targetDirectory;
 	
 	public DummyLocalUploader() {
@@ -17,11 +16,10 @@ public class DummyLocalUploader implements ActionUploaderIF {
 	}
 	
 	@Override
-	public void uploadEclipseActionToServer(final String xmlFile) throws UploadActionException {
-		this.counter++;
+	public void uploadEclipseActionToServer(final int actionId, final Date timestamp, final String xmlFile) throws UploadActionException {
 		BufferedWriter writer = null;
-		final String timestamp = getFormattedTimestamp();
-		final String fileName = this.targetDirectory + "ACTION_" + timestamp + "_" + this.counter + ".xml";
+		final String formattedTime = getFormattedTimestamp(timestamp);
+		final String fileName = createFileName(formattedTime, actionId);
 		try {
 			writer = new BufferedWriter(new FileWriter(fileName));
 			writer.write(xmlFile);
@@ -38,9 +36,13 @@ public class DummyLocalUploader implements ActionUploaderIF {
 		
 	}
 	
-	private String getFormattedTimestamp() {
-		final SimpleDateFormat format = new SimpleDateFormat("yyyymmddHHmmss");
-		return format.format(new Date());
+	private String getFormattedTimestamp(final Date date) {
+		final SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+		return format.format(date);
+	}
+	
+	private String createFileName(final String timestamp, final int action_id) {
+		return String.format("%sACTION_%s_%05d.xml", this.targetDirectory, timestamp, action_id);
 	}
 	
 }

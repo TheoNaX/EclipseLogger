@@ -2,6 +2,8 @@ package eclipselogger.sender;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -62,9 +64,9 @@ public class SFTPActionUploader implements ActionUploaderIF {
 	}
 	
 	@Override
-	public void uploadEclipseActionToServer(final String xmlFile) throws UploadActionException {
-		// TODO filename should contain timestamp + some id
-		final String fileName = this.targetDirectory + "";
+	public void uploadEclipseActionToServer(final int actionId, final Date timestamp, final String xmlFile) throws UploadActionException {
+		// TODO maybe some user identification should be used as for more users file name can be the same
+		final String fileName = createFileName(getFormattedTimestamp(timestamp), actionId);
 		InputStream is = null;
 		try {
 			// check connection
@@ -83,6 +85,15 @@ public class SFTPActionUploader implements ActionUploaderIF {
 				} catch (final Exception ignore) {}
 			}
 		}
+	}
+	
+	private String createFileName(final String timestamp, final int action_id) {
+		return String.format("%sACTION_%s_%05d.xml", this.targetDirectory, timestamp, action_id);
+	}
+	
+	private String getFormattedTimestamp(final Date date) {
+		final SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+		return format.format(date);
 	}
 
 }

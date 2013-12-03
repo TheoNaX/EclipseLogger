@@ -1,7 +1,7 @@
 package eclipselogger.logging;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 
 import org.apache.log4j.Logger;
 
@@ -361,8 +361,9 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.setString(5, action.getRecentActions());
 			ps.setInt(6, action.getRecentSameActionsCount());
 			ps.setInt(7, EclipseAction.SEND_STATUS_UNSENT);
-			final Date timestamp = new Date(action.getTimestamp().getTime());
-			ps.setDate(8, timestamp);
+
+			final Timestamp timestamp = new Timestamp(action.getTimestamp().getTime());
+			ps.setTimestamp(8, timestamp);
 			ps.setInt(9, action.getPackageDistanceFromLastAction());
 			
 			ps.setInt(10, action.getMostRecentFileChanges().getAddedLines());
@@ -384,8 +385,9 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			
 			ps.setInt(24, action.getSameActionsCountInContext());
 			ps.setDouble(25, action.getSameActionsRatio());
-			ps.setInt(26, action.getSameActionsTransitionsCount());
-			ps.setDouble(27, action.getSameActionsTransitionsRatio());
+			ps.setLong(26, action.getTimeSinceLastSameAction());
+			ps.setInt(27, action.getSameActionsTransitionsCount());
+			ps.setDouble(28, action.getSameActionsTransitionsRatio());
 			
 			ps.executeUpdate();
 		}

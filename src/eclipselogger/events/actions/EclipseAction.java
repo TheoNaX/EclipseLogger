@@ -65,7 +65,7 @@ public abstract class EclipseAction {
 		this.previousAction = rs.getInt(ActionDB.LAST_ACTION);
 		this.action_id = rs.getInt(ActionDB.ECLIPSE_ACTION_ID);
 		this.contextChange = rs.getBoolean(ActionDB.CONTEXT);
-		this.timestamp = rs.getDate(ActionDB.TIMESTAMP);
+		this.timestamp = rs.getTimestamp(ActionDB.TIMESTAMP);
 		this.recentActions = rs.getString(ActionDB.RECENT_ACTIONS);
 		this.recentSameActionsCount = rs.getInt(ActionDB.RECENT_SAME_ACTIONS_COUNT);
 		this.packageDistanceFromLastAction = rs.getInt(ActionDB.PACKAGE_DISTANCE);
@@ -73,8 +73,9 @@ public abstract class EclipseAction {
 		// context
 		this.mostRecentFileChanges = getRecentFileChangesFromResultSet(rs);
 		this.averageFileChanges = getAverageFileChangesFromResultSet(rs);
-		this.averagePackageDistanceDiff = rs.getDouble(ActionDB.AVERAGE_DURATION_DIFF);
-		this.averagePackageDistanceDiffForAction = rs.getDouble(ActionDB.AVERAGE_DURATION_ACTION_DIFF);
+		
+		this.averagePackageDistanceDiff = rs.getDouble(ActionDB.AVERAGE_PACKAGE_DIFF);
+		this.averagePackageDistanceDiffForAction = rs.getDouble(ActionDB.AVERAGE_PACKAGE_ACTION_DIFF);
 		this.maxPackageDistanceDiff = rs.getInt(ActionDB.MAX_PACKAGE_DIFF);
 		this.minPackageDistanceDiff = rs.getInt(ActionDB.MIN_PACKAGE_DIFF);
 		
@@ -200,10 +201,15 @@ public abstract class EclipseAction {
 	
 	private void applyContextToPackageDistances(final TaskContext context) {
 		final double avgDistance = context.getAveragePackageDistance();
+		System.out.println(">>>>>> package distance from last action: " + this.packageDistanceFromLastAction);
+		System.out.println(">>>>> average package distance: " + avgDistance);
 		this.averagePackageDistanceDiff = (avgDistance >= this.packageDistanceFromLastAction) ? (avgDistance - this.packageDistanceFromLastAction) : (this.packageDistanceFromLastAction - avgDistance);
+		System.out.println(">>>>>>>> averagePackageDistanceDiff: " + this.averagePackageDistanceDiff);
 		
 		final double avgForAction = context.getAveragePackageDistanceForAction(getActionType());
+		System.out.println(">>>>> average package distance for action: " + avgForAction);
 		this.averagePackageDistanceDiffForAction = (avgForAction >= this.packageDistanceFromLastAction) ? (avgForAction - this.packageDistanceFromLastAction) : (this.packageDistanceFromLastAction - avgForAction);
+		System.out.println(">>>>>>> averagePackageDistanceDiffForAction: " + this.averagePackageDistanceDiffForAction);
 		
 		final int maxPackageDistance = context.getMaxPackageDistance();
 		this.maxPackageDistanceDiff = (maxPackageDistance >= this.packageDistanceFromLastAction) ? (maxPackageDistance - this.packageDistanceFromLastAction) : (this.packageDistanceFromLastAction - maxPackageDistance);
@@ -231,7 +237,7 @@ public abstract class EclipseAction {
 	private void applyContextToActionCounts(final TaskContext context) {
 		if (context.getTotalActionsCount() > 0) {
 			this.sameActionsCountInContext = context.getSameActionsCount(getActionType());
-			this.sameActionsRatio = this.sameActionsCountInContext / context.getTotalActionsCount();
+			this.sameActionsRatio = (double) this.sameActionsCountInContext / context.getTotalActionsCount();
 		}
 
 		final EclipseAction lastSameAction = context.getLastSameAction(getActionType());
@@ -242,7 +248,7 @@ public abstract class EclipseAction {
 		if (this.lastAction != null) {
 			this.sameActionsTransitionsCount = context.getSameActionsTransitions(this.lastAction.getActionType(), getActionType());
 			final int totalTransitions = (context.getTotalActionsCount() - 2 > 1) ? context.getTotalActionsCount() - 2 : 1;
-			this.sameActionsTransitionsRatio = this.sameActionsTransitionsCount / totalTransitions;
+			this.sameActionsTransitionsRatio = (double) this.sameActionsTransitionsCount / totalTransitions;
 		} 
 		
 	}

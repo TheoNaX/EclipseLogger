@@ -1,19 +1,25 @@
 package eclipselogger.sender;
 
+import java.util.Date;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.log4j.Logger;
 
 public class RESTActionUploader implements ActionUploaderIF {
 
 	public static final String WEBSERVICE_URL = "";
 	CloseableHttpClient httpClient = HttpClients.createDefault();
 	
+	private static Logger logger = Logger.getLogger(RESTActionUploader.class);
+	
 	@Override
-	public void uploadEclipseActionToServer(final String xmlFile) throws UploadActionException{
+	public void uploadEclipseActionToServer(final int actionId, final Date timestamp, final String xmlFile) throws UploadActionException{
+		logger.info("Going to upload action with ID: " + actionId + " created at: " + timestamp);
 		StringEntity input = null;
 		final HttpPost httpPost = new HttpPost(WEBSERVICE_URL);
 		try {

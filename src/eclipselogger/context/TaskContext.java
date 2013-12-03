@@ -102,12 +102,12 @@ public class TaskContext {
 		if (packageDistance > this.maxPackageDistance) {
 			this.maxPackageDistance = packageDistance;
 		}
-		if (packageDistance < this.minPackageDistance) {
+		if (this.minPackageDistance == 0 || packageDistance < this.minPackageDistance) {
 			this.minPackageDistance = packageDistance;
 		}
 		logger.debug("Before update of packageDistances, total: " + this.totalPackageDistances + ", average: " + this.averagePackageDistance);
 		this.totalPackageDistances += action.getPackageDistanceFromLastAction();
-		this.averagePackageDistance = this.totalPackageDistances / this.totalActionsCount;
+		this.averagePackageDistance = (double) this.totalPackageDistances / this.totalActionsCount;
 		logger.debug("After update of packageDistances, total: " + this.totalPackageDistances + ", average: " + this.averagePackageDistance);
 		
 		
@@ -116,7 +116,7 @@ public class TaskContext {
 			totalActionDistance += action.getPackageDistanceFromLastAction();
 			this.totalPackageDistancePerAction.put(action.getActionType(), totalActionDistance);
 			final Integer counter = this.actionsCounter.get(action.getActionType());
-			final double average = totalActionDistance / counter;
+			final double average = (double) totalActionDistance / counter;
 			this.averagePackageDistancePerAction.put(action.getActionType(), average);
 		} else {
 			totalActionDistance = action.getPackageDistanceFromLastAction();
