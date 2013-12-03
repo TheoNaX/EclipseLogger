@@ -13,6 +13,30 @@ public class ActionDB {
 	public static final String RECENT_ACTIONS = "last_actions";
 	public static final String RECENT_SAME_ACTIONS_COUNT = "recent_same_actions_count";
 	
+	// context
+	public static final String RECENT_LINES_ADDED = "recent_lines_added";
+	public static final String RECENT_LINES_CHANGED = "recent_lines_changed";
+	public static final String RECENT_LINES_DELETED = "recent_lines_deleted";
+	public static final String AVERAGE_LINES_ADDED = "average_lines_added";
+	public static final String AVERAGE_LINES_CHANGED = "average_lines_changed";
+	public static final String AVERAGE_LINES_DELETED = "average_lines_deleted"; 
+	
+	public static final String AVERAGE_PACKAGE_DIFF = "average_package_diff";
+	public static final String AVERAGE_PACKAGE_ACTION_DIFF = "average_package_action_diff";
+	public static final String MAX_PACKAGE_DIFF = "max_package_diff";
+	public static final String MIN_PACKAGE_DIFF = "min_package_diff"; 
+	
+	public static final String AVERAGE_DURATION_DIFF = "average_duration_diff";
+	public static final String AVERAGE_DURATION_ACTION_DIFF = "average_duration_action_diff";
+	public static final String MAX_DURATION_DIFF = "max_duration_diff";
+	public static final String MIN_DURATION_DIFF = "min_duration_diff";
+	
+	public static final String CONTEXT_SAME_ACTIONS = "context_same_actions";
+	public static final String SAME_ACTIONS_RATIO = "same_actions_ratio";
+	public static final String TIME_SINCE_LAST_SAME = "time_since_last_same";
+	public static final String SAME_TRANSITIONS_COUNT = "same_transitions_count";
+	public static final String SAME_TRANSITIONS_RATIO = "same_transitions_ratio";
+	
 	// add file
 	public static final String SAME_PACKAGE = "same_package";
 	public static final String SAME_PROJECT = "same_project";

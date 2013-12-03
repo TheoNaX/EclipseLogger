@@ -19,7 +19,7 @@ public class TaskContext {
 	
 	private final List<EclipseAction> contextActions = new ArrayList<EclipseAction>();
 	
-	private final HashMap<ActionType, FileChanges> fileChangesPerAction = new HashMap<ActionType, FileChanges>();
+	//private final HashMap<ActionType, FileChanges> fileChangesPerAction = new HashMap<ActionType, FileChanges>();
 	
 	private final HashMap<ActionType, Long> averageDurationPerAction = new HashMap<ActionType, Long>();
 	private final HashMap<ActionType, Long> totalDurationPerAction = new HashMap<ActionType, Long>();
@@ -39,6 +39,7 @@ public class TaskContext {
 	
 	private final FileChanges overallFileChanges = new FileChanges();
 	private FileChanges lastFileChanges;
+	private FileChanges averageFileChanges;
 	
 	
 	public void updateContextWithAction(final EclipseAction action) {
@@ -120,6 +121,127 @@ public class TaskContext {
 		
 	}
 	
+	public void updateFileChanges(final FileChanges changes) {
+		this.overallFileChanges.updateFileChanges(changes);
+		this.lastFileChanges = changes;
+		final int deleted = (this.overallFileChanges.getDeletedLines()) / (this.totalActionsCount+1);
+		final int added = (this.overallFileChanges.getAddedLines()) / (this.totalActionsCount+1);
+		final int changed = (this.overallFileChanges.getChangedLines()) / (this.totalActionsCount+1);
+		this.averageFileChanges = new FileChanges(changed, deleted, added);
+	}
+
+	public int getTotalActionsCount() {
+		return this.totalActionsCount;
+	}
+
+	public HashMap<ActionType, Long> getTotalDurationPerAction() {
+		return this.totalDurationPerAction;
+	}
+
+	public long getMaxActionDuration() {
+		return this.maxActionDuration;
+	}
+
+	public long getMinActionDuration() {
+		return this.minActionDuration;
+	}
+
+	public long getAverageDuration() {
+		return this.averageDuration;
+	}
+
+	public long getTotalDuration() {
+		return this.totalDuration;
+	}
+
+	public double getAveragePackageDistance() {
+		return this.averagePackageDistance;
+	}
+
+	public int getTotalPackageDistances() {
+		return this.totalPackageDistances;
+	}
+
+	public int getMaxPackageDistance() {
+		return this.maxPackageDistance;
+	}
+
+	public int getMinPackageDistance() {
+		return this.minPackageDistance;
+	}
+
+	public HashMap<ActionType, Integer> getTotalPackageDistancePerAction() {
+		return this.totalPackageDistancePerAction;
+	}
+
+	public FileChanges getOverallFileChanges() {
+		return this.overallFileChanges;
+	}
+
+	public FileChanges getLastFileChanges() {
+		return this.lastFileChanges;
+	}
 	
+	public FileChanges getAverageFileChanges() {
+		return this.averageFileChanges;
+	}
 	
+	public List<EclipseAction> getContextActions() {
+		return this.contextActions;
+	}
+	
+	public long getAverageDurationForAction(final ActionType type) {
+		final Long duration = this.averageDurationPerAction.get(type);
+		if (duration != null) {
+			return duration;
+		} else {
+			return 0L;
+		}
+	}
+	
+	public double getAveragePackageDistanceForAction(final ActionType type) {
+		final Double distance = this.averagePackageDistancePerAction.get(type);
+		if (distance != null) {
+			return distance;
+		} else {
+			return 0.0;
+		}
+	}
+	
+	public EclipseAction getLastSameAction(final ActionType type) {
+		EclipseAction action = null;
+		final int count = this.contextActions.size();
+		for (int i=count-1; i>=0; i--) {
+			final EclipseAction a = this.contextActions.get(i);
+			if (a.getActionType() == type) {
+				action = a;
+				break;
+			}
+		}
+		
+		return action;
+	}
+	
+	public int getSameActionsCount(final ActionType type) {
+		int count = 0;
+		for (int i=0; i<this.contextActions.size(); i++) {
+			if (this.contextActions.get(i).getActionType() == type) {
+				count++;
+			}
+		}
+		
+		return count;
+	}
+	
+	public int getSameActionsTransitions(final ActionType first, final ActionType second) {
+		int count = 0;
+		final int actionsCount = this.contextActions.size();
+		for (int i=0; i<actionsCount-1; i++) {
+			if (this.contextActions.get(i).getActionType() == first && this.contextActions.get(i+1).getActionType() == second) {
+				count++;
+			}
+		}
+		
+		return count;
+	}
 }

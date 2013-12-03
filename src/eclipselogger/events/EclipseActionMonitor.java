@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.swt.widgets.Display;
 
+import eclipselogger.context.TaskContext;
 import eclipselogger.events.actions.ActionType;
 import eclipselogger.events.actions.AddFileAction;
 import eclipselogger.events.actions.AddPackageAction;
@@ -45,19 +47,32 @@ public class EclipseActionMonitor {
 	private static EclipseAction lastAction;
 	private static long lastActionTime;
 	
+	private static Logger logger = Logger.getLogger(EclipseActionMonitor.class);
+	
 	// loggers
 	private static EclipseActiontLogIF dbLogger = new DatabaseActionLogger();
 	
+	// popup window for confirming context change
 	private static ContextChangeDialog contextDialog;
 	
-	
+	// list of loggers to log Eclipse actions
 	private static final List<EclipseActiontLogIF> loggers = new ArrayList<EclipseActiontLogIF>();
 	
+	// cache used for storing content of actual file. This content is used to compute file changes
 	private static ActualFileContentCache fileContentCache = new ActualFileContentCache(); 
 	
+	// hash map of working files. Contains all opened files and key to map is project path to file
 	private static HashMap<String, WorkingFile> workingFiles = new LinkedHashMap<String, WorkingFile>();
+	
+	// cache used for storing recent actions
 	private static ActionsCache recentActions = new ActionsCache();
 	
+	// task context of user
+	private static TaskContext taskContext = new TaskContext();
+	
+	// initialization of Eclipse action loggers
+	// database logger is used always to store actions in SQLite db an then can be sent to server
+	// other loggers are configurable
 	public static void init() {
 		loggers.add(dbLogger);
 		if (ConfigReader.getLoggers().contains(EclipseActiontLogIF.LOG4J_LOGGER)) {
@@ -70,6 +85,17 @@ public class EclipseActionMonitor {
 		}
 		
 	}
+	
+	public static void resetTaskContext() {
+		logger.info("Resetting programmer's context...");
+		taskContext = new TaskContext();
+	}
+	
+	public static void updateTaskContextWithFinishedAction(final EclipseAction action) {
+		logger.info("Last action was not context change, updating task context");
+		taskContext.updateContextWithAction(action);
+	}
+	
 	
 	public static void setActualFile(final IFile file) {
 		updateActualFile(file);
@@ -198,7 +224,7 @@ public class EclipseActionMonitor {
 	public static void refactorPackage(final IFolder oldPack, final IFolder newPack) {
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
-		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.SWITCH_FILE).size();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.REFACTOR_PACKAGE).size();
 		
 		final int packageDistance = getPackageDistance(oldPack);
 		final RefactorPackageAction refPackAction = new RefactorPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldPack, newPack, previousFile, packageDistance);
@@ -234,7 +260,7 @@ public class EclipseActionMonitor {
 	public static void deleteFolder(final IFolder folder) {
 		final long timeSinceLastAction = (lastActionTime == 0) ? 0 : (System.currentTimeMillis() - lastActionTime);
 		final String lastActions = recentActions.getLastActionsForEclipseAction();
-		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.DELETE_FILE).size();
+		final int recentCount = recentActions.getRecentActionsWithSameType(ActionType.DELETE_PACKAGE).size();
 		
 		final int packageDistance = getPackageDistance(folder);
 		final DeletePackageAction action = new DeletePackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, folder, actualFile, packageDistance);
