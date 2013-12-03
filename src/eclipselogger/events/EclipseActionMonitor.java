@@ -152,6 +152,7 @@ public class EclipseActionMonitor {
 				
 				if (changes != null) {
 					workFile.getFileChanges().updateFileChanges(changes);
+					taskContext.updateFileChanges(changes);
 				}
 				
 			}
@@ -181,6 +182,8 @@ public class EclipseActionMonitor {
 		final int packageDistance = getPackageDistance(file);
 		
 		final CloseFileAction closeAction = new CloseFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previous, closed, packageDistance);
+		closeAction.applyContext(taskContext);
+		closeAction.setResource(file);
 		showContextChangeDialog(closeAction);
 		//logEclipseAction(closeAction, DEFAULT_CONTEXT);
 		afterAction(closeAction);
@@ -202,6 +205,8 @@ public class EclipseActionMonitor {
 		
 		final int packageDistance = getPackageDistance(file);
 		final OpenNewFileAction openAction = new OpenNewFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previousFile, packageDistance);
+		openAction.applyContext(taskContext);
+		openAction.setResource(file);
 		showContextChangeDialog(openAction);
 		//logEclipseAction(openAction, DEFAULT_CONTEXT);
 		afterAction(openAction); // TODO check if needed 
@@ -216,6 +221,8 @@ public class EclipseActionMonitor {
 		
 		final int packageDistance = getPackageDistance(file);
 		final SwitchToFileAction switchAction = new SwitchToFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previousFile, packageDistance);
+		switchAction.applyContext(taskContext);
+		switchAction.setResource(file);
 		//logEclipseAction(switchAction, DEFAULT_CONTEXT);
 		showContextChangeDialog(switchAction);
 		afterAction(switchAction);
@@ -229,6 +236,8 @@ public class EclipseActionMonitor {
 		final int packageDistance = getPackageDistance(oldPack);
 		final RefactorPackageAction refPackAction = new RefactorPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldPack, newPack, previousFile, packageDistance);
 		showContextChangeDialog(refPackAction);
+		refPackAction.applyContext(taskContext);
+		refPackAction.setResource(oldPack);
 		//logEclipseAction(refPackAction, DEFAULT_CONTEXT);
 		afterAction(refPackAction);
 	}
@@ -240,6 +249,8 @@ public class EclipseActionMonitor {
 		
 		final int packageDistance = getPackageDistance(oldFile);
 		final RefactorFileAction refFileAction = new RefactorFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldFile, newFile, previousFile, packageDistance);
+		refFileAction.applyContext(taskContext);
+		refFileAction.setResource(oldFile);
 		showContextChangeDialog(refFileAction);
 		//logEclipseAction(refFileAction, DEFAULT_CONTEXT);
 		afterAction(refFileAction);
@@ -252,6 +263,8 @@ public class EclipseActionMonitor {
 		
 		final int packageDistance = getPackageDistance(folder);
 		final AddPackageAction action = new AddPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, folder, actualFile, packageDistance);
+		action.applyContext(taskContext);
+		action.setResource(folder);
 		showContextChangeDialog(action);
 		//logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
@@ -264,6 +277,8 @@ public class EclipseActionMonitor {
 		
 		final int packageDistance = getPackageDistance(folder);
 		final DeletePackageAction action = new DeletePackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, folder, actualFile, packageDistance);
+		action.applyContext(taskContext);
+		action.setResource(folder);
 		showContextChangeDialog(action);
 		//logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
@@ -276,6 +291,8 @@ public class EclipseActionMonitor {
 		
 		final int packageDistance = getPackageDistance(file);
 		final AddFileAction action = new AddFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, actualFile, packageDistance);
+		action.applyContext(taskContext);
+		action.setResource(file);
 		showContextChangeDialog(action);
 		//logEclipseAction(action, DEFAULT_CONTEXT);
 		afterAction(action);
@@ -295,6 +312,8 @@ public class EclipseActionMonitor {
 		final WorkingFile deleted = workingFiles.remove(file.getProjectRelativePath().toOSString());
 		final int packageDistance = getPackageDistance(file);
 		final DeleteFileAction deleteFileAction = new DeleteFileAction(timeSinceLastAction, lastAction, lastActions, recentCount, file, previous, deleted, packageDistance);
+		deleteFileAction.applyContext(taskContext);
+		deleteFileAction.setResource(file);
 		showContextChangeDialog(deleteFileAction);
 		//logEclipseAction(deleteFileAction, DEFAULT_CONTEXT);
 		afterAction(deleteFileAction);
@@ -308,6 +327,8 @@ public class EclipseActionMonitor {
 		
 		final AddProjectAction action = new AddProjectAction(timeSinceLastAction, lastAction, lastActions, recentCount, project, 0);
 		//logEclipseAction(action, DEFAULT_CONTEXT);
+		action.applyContext(taskContext);
+		action.setResource(project);
 		showContextChangeDialog(action);
 		afterAction(action);
 	}
@@ -321,6 +342,11 @@ public class EclipseActionMonitor {
 	public static void logEclipseAction(final EclipseAction action, final boolean contextChange) {
 		for (final EclipseActiontLogIF logger : loggers) {
 			logger.logEclipseAction(action, contextChange);
+		}
+		if (contextChange) {
+			resetTaskContext();
+		} else {
+			taskContext.updateContextWithAction(action);
 		}
 	}
 	

@@ -109,6 +109,94 @@ public class XMLActionFormatter implements ActionFormatterIF {
 		sb.append("</contextChange>");
 		sb.append("\n");
 		
+		sb.append(formatContextSpecificParams(action));
+		
+		return sb.toString();
+	}
+	
+	private String formatContextSpecificParams(final EclipseAction action) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("<recentLinesAdded>");
+		sb.append(action.getMostRecentFileChanges().getAddedLines());
+		sb.append("</recentLinesAdded>");
+		sb.append("\n");
+		sb.append("<recentLinesChanged>");
+		sb.append(action.getMostRecentFileChanges().getChangedLines());
+		sb.append("</recentLinesChanged>");
+		sb.append("\n");
+		sb.append("<recentLinesDeleted>");
+		sb.append(action.getMostRecentFileChanges().getDeletedLines());
+		sb.append("</recentLinesDeleted>");
+		sb.append("\n");
+		
+		sb.append("<averageLinesAdded>");
+		sb.append(action.getAverageFileChanges().getAddedLines());
+		sb.append("</averageLinesAdded>");
+		sb.append("\n");
+		sb.append("<averageLinesChanged>");
+		sb.append(action.getAverageFileChanges().getChangedLines());
+		sb.append("</averageLinesChanged>");
+		sb.append("\n");
+		sb.append("<averageLinesDeleted>");
+		sb.append(action.getAverageFileChanges().getDeletedLines());
+		sb.append("</averageLinesDeleted>");
+		sb.append("\n");
+		
+		sb.append("<averagePackageDistanceDiff>");
+		sb.append(action.getAveragePackageDistanceDiff());
+		sb.append("</averagePackageDistanceDiff>");
+		sb.append("\n");
+		sb.append("<averagePackageDistanceDiffForAction>");
+		sb.append(action.getAveragePackageDistanceDiffForAction());
+		sb.append("</averagePackageDistanceDiffForAction>");
+		sb.append("\n");
+		sb.append("<maxPackageDistanceDiff>");
+		sb.append(action.getMaxPackageDistanceDiff());
+		sb.append("</maxPackageDistanceDiff>");
+		sb.append("\n");
+		sb.append("<minPackageDistanceDiff>");
+		sb.append(action.getMinPackageDistanceDiff());
+		sb.append("</minPackageDistanceDiff>");
+		sb.append("\n");
+		
+		sb.append("<averageDurationDiffForAction>");
+		sb.append(action.getAverageDurationDiffForAction());
+		sb.append("</averageDurationDiffForAction>");
+		sb.append("\n");
+		sb.append("<averageDurationDiff>");
+		sb.append(action.getAverageDurationDiff());
+		sb.append("</averageDurationDiff>");
+		sb.append("\n");
+		sb.append("<maxDurationDiff>");
+		sb.append(action.getMaxDurationDiff());
+		sb.append("</maxDurationDiff>");
+		sb.append("\n");
+		sb.append("<minDurationDiff>");
+		sb.append(action.getMinDurationDiff());
+		sb.append("</minDurationDiff>");
+		sb.append("\n");
+		
+		sb.append("<sameActionsCountInContext>");
+		sb.append(action.getSameActionsCountInContext());
+		sb.append("</sameActionsCountInContext>");
+		sb.append("\n");
+		sb.append("<sameActionsRatio>");
+		sb.append(action.getSameActionsRatio());
+		sb.append("</sameActionsRatio>");
+		sb.append("\n");
+		sb.append("<timeSinceLastSameAction>");
+		sb.append(action.getTimeSinceLastSameAction());
+		sb.append("</timeSinceLastSameAction>");
+		sb.append("\n");
+		sb.append("<sameActionsTransitionsCount>");
+		sb.append(action.getSameActionsTransitionsCount());
+		sb.append("</sameActionsTransitionsCount>");
+		sb.append("\n");
+		sb.append("<sameActionsTransitionsRatio>");
+		sb.append(action.getSameActionsTransitionsRatio());
+		sb.append("</sameActionsTransitionsRatio>");
+		sb.append("\n");
+		
 		return sb.toString();
 	}
 	

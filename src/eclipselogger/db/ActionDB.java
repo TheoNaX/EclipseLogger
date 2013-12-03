@@ -12,6 +12,7 @@ public class ActionDB {
 	public static final String TIMESTAMP = "time_stamp";
 	public static final String RECENT_ACTIONS = "last_actions";
 	public static final String RECENT_SAME_ACTIONS_COUNT = "recent_same_actions_count";
+	public static final String PACKAGE_DISTANCE = "package_distance";
 	
 	// context
 	public static final String RECENT_LINES_ADDED = "recent_lines_added";

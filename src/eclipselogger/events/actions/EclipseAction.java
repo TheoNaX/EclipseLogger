@@ -68,6 +68,7 @@ public abstract class EclipseAction {
 		this.timestamp = rs.getDate(ActionDB.TIMESTAMP);
 		this.recentActions = rs.getString(ActionDB.RECENT_ACTIONS);
 		this.recentSameActionsCount = rs.getInt(ActionDB.RECENT_SAME_ACTIONS_COUNT);
+		this.packageDistanceFromLastAction = rs.getInt(ActionDB.PACKAGE_DISTANCE);
 		
 		// context
 		this.mostRecentFileChanges = getRecentFileChangesFromResultSet(rs);
@@ -144,6 +145,7 @@ public abstract class EclipseAction {
 		query.addColumnToSelect(ActionDB.LAST_ACTION);
 		query.addColumnToSelect(ActionDB.RECENT_ACTIONS);
 		query.addColumnToSelect(ActionDB.RECENT_SAME_ACTIONS_COUNT);
+		query.addColumnToSelect(ActionDB.PACKAGE_DISTANCE);
 		
 		// context specific
 		query.addColumnToSelect(ActionDB.RECENT_LINES_CHANGED);
@@ -184,9 +186,6 @@ public abstract class EclipseAction {
 		this.resource = resource;
 	}
 	
-	public int getPackageDistance() {
-		return this.packageDistanceFromLastAction;
-	}
 	
 	public void applyContext(final TaskContext context) {
 		this.mostRecentFileChanges = context.getLastFileChanges();
@@ -230,9 +229,11 @@ public abstract class EclipseAction {
 	
 	
 	private void applyContextToActionCounts(final TaskContext context) {
-		this.sameActionsCountInContext = context.getSameActionsCount(getActionType());
-		this.sameActionsRatio = this.sameActionsCountInContext / context.getTotalActionsCount();
-		
+		if (context.getTotalActionsCount() > 0) {
+			this.sameActionsCountInContext = context.getSameActionsCount(getActionType());
+			this.sameActionsRatio = this.sameActionsCountInContext / context.getTotalActionsCount();
+		}
+
 		final EclipseAction lastSameAction = context.getLastSameAction(getActionType());
 		if (lastSameAction != null) {
 			this.timeSinceLastSameAction = this.timestamp.getTime() - lastSameAction.getTimestamp().getTime();
@@ -240,9 +241,78 @@ public abstract class EclipseAction {
 		
 		if (this.lastAction != null) {
 			this.sameActionsTransitionsCount = context.getSameActionsTransitions(this.lastAction.getActionType(), getActionType());
-			this.sameActionsTransitionsRatio = this.sameActionsTransitionsCount / (context.getTotalActionsCount() - 2);
+			final int totalTransitions = (context.getTotalActionsCount() - 2 > 1) ? context.getTotalActionsCount() - 2 : 1;
+			this.sameActionsTransitionsRatio = this.sameActionsTransitionsCount / totalTransitions;
 		} 
 		
+	}
+
+	public int getPackageDistanceFromLastAction() {
+		return this.packageDistanceFromLastAction;
+	}
+
+	public FileChanges getMostRecentFileChanges() {
+		return this.mostRecentFileChanges;
+	}
+
+	public FileChanges getAverageFileChanges() {
+		return this.averageFileChanges;
+	}
+
+	public double getAveragePackageDistanceDiff() {
+		return this.averagePackageDistanceDiff;
+	}
+
+	public double getAveragePackageDistanceDiffForAction() {
+		return this.averagePackageDistanceDiffForAction;
+	}
+
+	public int getMaxPackageDistanceDiff() {
+		return this.maxPackageDistanceDiff;
+	}
+
+	public int getMinPackageDistanceDiff() {
+		return this.minPackageDistanceDiff;
+	}
+
+	public long getAverageDurationDiffForAction() {
+		return this.averageDurationDiffForAction;
+	}
+
+	public long getAverageDurationDiff() {
+		return this.averageDurationDiff;
+	}
+
+	public long getMaxDurationDiff() {
+		return this.maxDurationDiff;
+	}
+
+	public long getMinDurationDiff() {
+		return this.minDurationDiff;
+	}
+
+	public int getSameActionsCountInContext() {
+		return this.sameActionsCountInContext;
+	}
+
+	public double getSameActionsRatio() {
+		return this.sameActionsRatio;
+	}
+
+	public long getTimeSinceLastSameAction() {
+		return this.timeSinceLastSameAction;
+	}
+
+	public int getSameActionsTransitionsCount() {
+		return this.sameActionsTransitionsCount;
+	}
+
+	public double getSameActionsTransitionsRatio() {
+		return this.sameActionsTransitionsRatio;
+	}
+	
+	public EclipseAction getLastAction() {
+		return this.lastAction;
 	}
 	
 	

@@ -55,12 +55,6 @@ public class CloseFileAction extends EclipseAction {
 		return this.samePackage;
 	}
 	
-	@Override
-	public int getPackageDistance() {
-		// TODO implement package distances
-		return 0;
-	}
-	
 	public String getClosedFile() {
 		return this.closedFile;
 	}

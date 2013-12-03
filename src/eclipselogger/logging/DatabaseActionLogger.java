@@ -346,7 +346,11 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 	}
 	
 	private void insertEclipseActionIntoDb(final EclipseAction action, final boolean context) throws Exception {
-		final String sql = "INSERT INTO eclipse_action(last_action, time_since_last, action, context_change, last_actions, recent_same_actions_count, send_status, time_stamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		final String sql = "INSERT INTO eclipse_action(last_action, time_since_last, action, context_change, last_actions, recent_same_actions_count, send_status, "
+				+ "time_stamp, package_distance, recent_lines_added, recent_lines_changed, recent_lines_deleted, average_lines_added, average_lines_changed, average_lines_deleted, "
+				+ "average_package_diff, average_package_action_diff, max_package_diff, min_package_diff, average_duration_diff, average_duration_action_diff, max_duration_diff, "
+				+ "min_duration_diff, context_same_actions, same_actions_ratio, time_since_last_same, same_transitions_count, same_transitions_ratio) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 		PreparedStatement ps = null;
 		try {
 			ps = this.dbHandler.prepareStatement(sql);
@@ -359,6 +363,29 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.setInt(7, EclipseAction.SEND_STATUS_UNSENT);
 			final Date timestamp = new Date(action.getTimestamp().getTime());
 			ps.setDate(8, timestamp);
+			ps.setInt(9, action.getPackageDistanceFromLastAction());
+			
+			ps.setInt(10, action.getMostRecentFileChanges().getAddedLines());
+			ps.setInt(11, action.getMostRecentFileChanges().getChangedLines());
+			ps.setInt(12, action.getMostRecentFileChanges().getDeletedLines());
+			ps.setInt(13, action.getAverageFileChanges().getAddedLines());
+			ps.setInt(14, action.getAverageFileChanges().getChangedLines());
+			ps.setInt(15, action.getAverageFileChanges().getDeletedLines());
+			
+			ps.setDouble(16, action.getAveragePackageDistanceDiff());
+			ps.setDouble(17, action.getAveragePackageDistanceDiffForAction());
+			ps.setInt(18, action.getMaxPackageDistanceDiff());
+			ps.setInt(19, action.getMinPackageDistanceDiff());
+			
+			ps.setLong(20, action.getAverageDurationDiff());
+			ps.setLong(21, action.getAverageDurationDiffForAction());
+			ps.setLong(22, action.getMaxDurationDiff());
+			ps.setLong(23, action.getMinDurationDiff());
+			
+			ps.setInt(24, action.getSameActionsCountInContext());
+			ps.setDouble(25, action.getSameActionsRatio());
+			ps.setInt(26, action.getSameActionsTransitionsCount());
+			ps.setDouble(27, action.getSameActionsTransitionsRatio());
 			
 			ps.executeUpdate();
 		}

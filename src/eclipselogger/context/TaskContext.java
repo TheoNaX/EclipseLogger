@@ -38,8 +38,8 @@ public class TaskContext {
 	private final HashMap<ActionType, Integer> totalPackageDistancePerAction = new HashMap<ActionType, Integer>();
 	
 	private final FileChanges overallFileChanges = new FileChanges();
-	private FileChanges lastFileChanges;
-	private FileChanges averageFileChanges;
+	private FileChanges lastFileChanges = new FileChanges();
+	private FileChanges averageFileChanges = new FileChanges();
 	
 	
 	public void updateContextWithAction(final EclipseAction action) {
@@ -76,44 +76,50 @@ public class TaskContext {
 		}
 		this.totalDuration += action.getTimeSinceLastAction();
 		this.averageDuration = this.totalDuration / this.totalActionsCount;
-		
-		Long totalActionsDuration = this.totalDurationPerAction.get(action.getActionType());
+
+		final ActionType type = action.getActionType();
+		Long totalActionsDuration = this.totalDurationPerAction.get(type);
 		if (totalActionsDuration != null) {
 			logger.debug("Action already existed, total actions duration before: " + totalActionsDuration);
 			totalActionsDuration += action.getTimeSinceLastAction();
 			final Integer counter = this.actionsCounter.get(action.getActionType());
 			final long average = totalActionsDuration / counter;
-			this.averageDurationPerAction.put(action.getActionType(), average);
-			logger.debug("Total duration for action updated, after update: " + this.totalDurationPerAction.get(action.getActionType()));
+			this.averageDurationPerAction.put(type, average);
+			this.totalDurationPerAction.put(type, totalActionsDuration);
+			logger.debug("Total duration for action updated, after update: "
+					+ this.totalDurationPerAction.get(action.getActionType()));
 		} else {
 			logger.debug("First action of this type in task context");
 			totalActionsDuration = action.getTimeSinceLastAction();
-			this.totalDurationPerAction.put(action.getActionType(), totalActionsDuration);
-			this.averageDurationPerAction.put(action.getActionType(), totalActionsDuration);
+			this.totalDurationPerAction.put(type, totalActionsDuration);
+			this.averageDurationPerAction.put(type, totalActionsDuration);
 		}
 		
 	}
 	
 	private void updatePackageDistances(final EclipseAction action) {
-		final int packageDistance = action.getPackageDistance();
+		final int packageDistance = action.getPackageDistanceFromLastAction();
 		if (packageDistance > this.maxPackageDistance) {
 			this.maxPackageDistance = packageDistance;
 		}
 		if (packageDistance < this.minPackageDistance) {
 			this.minPackageDistance = packageDistance;
 		}
-		this.totalPackageDistances += action.getPackageDistance();
+		logger.debug("Before update of packageDistances, total: " + this.totalPackageDistances + ", average: " + this.averagePackageDistance);
+		this.totalPackageDistances += action.getPackageDistanceFromLastAction();
 		this.averagePackageDistance = this.totalPackageDistances / this.totalActionsCount;
+		logger.debug("After update of packageDistances, total: " + this.totalPackageDistances + ", average: " + this.averagePackageDistance);
 		
 		
 		Integer totalActionDistance = this.totalPackageDistancePerAction.get(action.getActionType());
 		if (totalActionDistance != null) {
-			totalActionDistance += action.getPackageDistance();
+			totalActionDistance += action.getPackageDistanceFromLastAction();
+			this.totalPackageDistancePerAction.put(action.getActionType(), totalActionDistance);
 			final Integer counter = this.actionsCounter.get(action.getActionType());
 			final double average = totalActionDistance / counter;
 			this.averagePackageDistancePerAction.put(action.getActionType(), average);
 		} else {
-			totalActionDistance = action.getPackageDistance();
+			totalActionDistance = action.getPackageDistanceFromLastAction();
 			this.totalPackageDistancePerAction.put(action.getActionType(), totalActionDistance);
 			this.averagePackageDistancePerAction.put(action.getActionType(), (double)totalActionDistance);
 		}
@@ -123,7 +129,10 @@ public class TaskContext {
 	
 	public void updateFileChanges(final FileChanges changes) {
 		this.overallFileChanges.updateFileChanges(changes);
-		this.lastFileChanges = changes;
+		
+		this.lastFileChanges = new FileChanges();
+		this.lastFileChanges.updateFileChanges(changes);
+		
 		final int deleted = (this.overallFileChanges.getDeletedLines()) / (this.totalActionsCount+1);
 		final int added = (this.overallFileChanges.getAddedLines()) / (this.totalActionsCount+1);
 		final int changed = (this.overallFileChanges.getChangedLines()) / (this.totalActionsCount+1);

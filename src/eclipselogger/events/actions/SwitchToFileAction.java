@@ -46,12 +46,6 @@ public class SwitchToFileAction extends EclipseAction {
 		return this.samePackage;
 	}
 	
-	@Override
-	public int getPackageDistance() {
-		// TODO implement package distances
-		return 0;
-	}
-	
 	public String getSwitchedToFile() {
 		return this.switchedToFile;
 	}
