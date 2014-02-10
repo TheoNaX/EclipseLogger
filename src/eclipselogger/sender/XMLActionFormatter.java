@@ -481,9 +481,9 @@ public class XMLActionFormatter implements ActionFormatterIF {
 		final RefactorPackageAction action = (RefactorPackageAction) a;
 		final StringBuilder sb = new StringBuilder();
 		
-		sb.append("<refactoredFile>");
+		sb.append("<refactoredPackage>");
 		sb.append(action.getRefactoredPackage());
-		sb.append("</refactoredFile>");
+		sb.append("</refactoredPackage>");
 		sb.append("\n");
 		
 		sb.append("<previousFile>");
