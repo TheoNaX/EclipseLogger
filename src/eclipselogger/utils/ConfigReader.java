@@ -48,7 +48,7 @@ public class ConfigReader {
 	}
 	
 	public static String getSftpFileTargetDirectory() {
-		return properties.getProperty(SFTP_TARGET_DIRECTORY, "/var/tmp");
+		return properties.getProperty(SFTP_TARGET_DIRECTORY, "");
 	}
 	
 	public static String getLocalFileTargetDirectory() {

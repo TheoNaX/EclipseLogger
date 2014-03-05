@@ -165,4 +165,19 @@ public class ActionLoader {
 		}
 	}
 	
+	public void updateUnsentActionContextChange(final int actionID, final boolean contextChange) throws Exception {
+		final String sql = "UPDATE " + EclipseAction.TABLE_NAME + " SET " + ActionDB.CONTEXT + " = ? WHERE " + ActionDB.ECLIPSE_ACTION_ID + " = ?";
+		PreparedStatement ps = null;
+		final int contextInt = (contextChange) ? 1 : 0;
+		try {
+			ps = this.dbHandler.prepareStatement(sql);
+			ps.setInt(1, contextInt);
+			ps.setInt(2, actionID);
+			ps.executeUpdate();
+		} finally {
+			DBCleanupTool.closeStatement(ps);
+			this.dbHandler.disposeConnection();
+		}
+	}
+	
 }
