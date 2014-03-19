@@ -12,7 +12,7 @@ public class EclipseUtils {
 	}
 	
 	public static String generateUserId() {
-		final String userName = System.getProperty("os.name", "eclipse");
+		final String userName = System.getProperty("user.name", "eclipse");
 		final String number = generateIdNumber();
 		return userName + number;
 	}
