@@ -1,9 +1,13 @@
 package eclipselogger.utils;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
 
 
 public class ConfigReader {
@@ -21,6 +25,7 @@ public class ConfigReader {
 	public static final String SFTP_USER_NAME = "SFTP_USER_NAME";
 	public static final String SFTP_PASSWORD = "SFTP_PASSWORD";
 	public static final String SFTP_TARGET_DIRECTORY = "SFTP_TARGET_DIRECTORY";
+	public static final String USER_ID = "USER_ID";
 	
 	// REST specific 
 	// TODO
@@ -33,6 +38,8 @@ public class ConfigReader {
 	public static final String RECENT_ACTIONS_COUNT = "RECENT_ACTIONS_COUNT";
 	
 	private static Properties properties;
+	
+	private static Logger logger = Logger.getLogger(ConfigReader.class);
 	
 	static {
 		readConfig();
@@ -110,8 +117,35 @@ public class ConfigReader {
 		return properties.getProperty(DB_NAME, "eclipselog.db");
 	}
 	
+	public static String getUserId() {
+		return properties.getProperty(USER_ID);
+	}
+	
 	public static Properties getProperties() {
 		return properties;
+	}
+	
+	public static void setUserId(final String userID) {
+		properties.setProperty(USER_ID, userID);
+	}
+	
+	public static void saveProperties() {
+		final String fileName = "config.properties";
+		File file;
+		FileOutputStream fo = null;
+		try {
+			file = new File(fileName);
+			fo = new FileOutputStream(file);
+			properties.store(fo, "Eclipse logger properties");
+		} catch (final Exception e) {
+			logger.error("Failed to save properties to file", e);
+		} finally {
+			try {
+				if (fo != null) {
+					fo.close();
+				}
+			} catch (final Exception ignore) {}
+		}
 	}
 	
 }

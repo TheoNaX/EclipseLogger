@@ -5,7 +5,7 @@ import org.eclipse.core.resources.IFolder;
 
 public class PackageUtils {
 	
-	public static boolean checkIfSamePackage(IFile actual, IFile previous) {
+	public static boolean checkIfSamePackage(final IFile actual, final IFile previous) {
 		boolean result = false;
 		if (actual == null || previous == null) {
 			return result;
@@ -23,14 +23,14 @@ public class PackageUtils {
 		return result;
 	}
 	
-	public static boolean checkIfSameProject(IFile actual, IFile previous) {
+	public static boolean checkIfSameProject(final IFile actual, final IFile previous) {
 		boolean result = false;
 		if (actual == null || previous == null) {
 			return result;
 		}
 		
-		String actualProjectName = actual.getProject().getName();
-		String previousProjectName = actual.getProject().getName();
+		final String actualProjectName = actual.getProject().getName();
+		final String previousProjectName = previous.getProject().getName();
 		if (actualProjectName != null && actualProjectName.equals(previousProjectName)) {
 			result = true;
 		}
@@ -38,13 +38,13 @@ public class PackageUtils {
 		return result;
 	}
 	
-	public static boolean checkIfSameProject(IFolder folder, IFile file) {
+	public static boolean checkIfSameProject(final IFolder folder, final IFile file) {
 		boolean result = false;
 		if (folder == null || file == null) {
 			return result;
 		}
-		String actualProjectName = folder.getProject().getName();
-		String previousProjectName = file.getProject().getName();
+		final String actualProjectName = folder.getProject().getName();
+		final String previousProjectName = file.getProject().getName();
 		if (actualProjectName != null && actualProjectName.equals(previousProjectName)) {
 			result = true;
 		}
@@ -52,7 +52,7 @@ public class PackageUtils {
 		return result;
 	}
 	
-	public static boolean checkIfSamePackage(IFolder folder, IFile file) {
+	public static boolean checkIfSamePackage(final IFolder folder, final IFile file) {
 		boolean result = false;
 		if (folder == null || file == null) {
 			return result;
@@ -61,7 +61,7 @@ public class PackageUtils {
 		String filePath = file.getProjectRelativePath().toOSString();
 		filePath = filePath.substring(0, filePath.indexOf(file.getName()));
 		
-		String folderParentPath = folder.getParent().getProjectRelativePath().toOSString();
+		final String folderParentPath = folder.getParent().getProjectRelativePath().toOSString();
 		if (folderParentPath != null && folderParentPath.equalsIgnoreCase(filePath)) {
 			result = true;
 		}

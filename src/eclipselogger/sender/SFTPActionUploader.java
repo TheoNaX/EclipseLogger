@@ -13,6 +13,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 import eclipselogger.utils.ConfigReader;
+import eclipselogger.utils.EclipseUtils;
 import eclipselogger.utils.FileUtilities;
 
 public class SFTPActionUploader implements ActionUploaderIF {
@@ -26,6 +27,8 @@ public class SFTPActionUploader implements ActionUploaderIF {
 	private final JSch jsch = new JSch();
 	private Session session;
 	private ChannelSftp sftp;
+	
+	private final String userId;
 	
 	private static Logger logger = Logger.getLogger(SFTPActionUploader.class);
 	
@@ -45,6 +48,8 @@ public class SFTPActionUploader implements ActionUploaderIF {
 		if (this.userName == null || this.password == null) {
 			throw new Exception("Missing authentication credentials for SFTP server");
 		}
+		
+		this.userId = getUserId();
 	}
 	
 	private void checkConnection() throws JSchException {
@@ -112,7 +117,19 @@ public class SFTPActionUploader implements ActionUploaderIF {
 	}
 	
 	private String createFileName(final String timestamp, final int action_id) {
-		return String.format("%sACTION_%s_%05d.xml", this.targetDirectory, timestamp, action_id);
+		return String.format("%sACTION_%s_%05d_%s.xml", this.targetDirectory, timestamp, action_id, this.userId);
+	}
+	
+	private static String getUserId() {
+		String userId = ConfigReader.getUserId();
+		if (userId == null) {
+			userId = EclipseUtils.generateUserId();
+			ConfigReader.setUserId(userId);
+			ConfigReader.saveProperties();
+		}
+		
+		return userId;
+		
 	}
 	
 	private String getFormattedTimestamp(final Date date) {

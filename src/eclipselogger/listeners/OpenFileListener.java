@@ -26,10 +26,10 @@ public class OpenFileListener implements IPartListener2 {
 			if (input instanceof IFileEditorInput) {
 				final IFile file = ((IFileEditorInput)input).getFile();
 				if ((this.lastOpened == null || !this.lastOpened.equals(file.getProjectRelativePath().toOSString()))
-						&& (this.lastSwitched == null || !this.lastSwitched.equals(file.getProjectRelativePath().toOSString()))) {
+						|| (this.lastSwitched == null || !this.lastSwitched.equals(file.getProjectRelativePath().toOSString()))) {
 					this.logger.info("Switched to file: " + file.getProjectRelativePath().toOSString());
-					EclipseActionMonitor.switchToFile(file);
 					this.lastSwitched = file.getProjectRelativePath().toOSString();
+					EclipseActionMonitor.switchToFile(file);
 				}
 			}
 			this.lastOpened = null;

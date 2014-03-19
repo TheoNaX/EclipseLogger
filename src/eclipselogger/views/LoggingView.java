@@ -1,6 +1,7 @@
 package eclipselogger.views;
 
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -41,6 +42,8 @@ public class LoggingView extends ViewPart {
     public LoggingView() {
     }
     
+    private static Logger logger = Logger.getLogger(LoggingView.class);
+    
     private final OpenFileListener listener = new OpenFileListener();
     private final IResourceChangeListener resourceListener = new ResourceChangeListener();
     
@@ -61,7 +64,7 @@ public class LoggingView extends ViewPart {
 		try {
 			this.fileSender = new ActionFileSender();
 		} catch (final Exception e) {
-			e.printStackTrace();
+			logger.error("Failed to create sender", e);
 		}
 
 		// init loggers for actions - see config.properties
