@@ -50,7 +50,7 @@ public class OpenFileListener implements IPartListener2 {
 			final IEditorInput input = editor.getEditorInput();
 			if (input instanceof IFileEditorInput) {
 				final IFile file = ((IFileEditorInput)input).getFile();
-				this.logger.info("File closed: " + file.getProjectRelativePath().toOSString());
+				this.logger.debug("File closed: " + file.getProjectRelativePath().toOSString());
 				EclipseActionMonitor.closeFile(file);
 			}
 		}
@@ -70,7 +70,7 @@ public class OpenFileListener implements IPartListener2 {
 			if (input instanceof IFileEditorInput) {
 				final IFile file = ((IFileEditorInput)input).getFile();
 				this.lastOpened = file.getProjectRelativePath().toOSString();
-				this.logger.info("File opened: " + file.getProjectRelativePath().toOSString());
+				this.logger.debug("File opened: " + file.getProjectRelativePath().toOSString());
 				EclipseActionMonitor.openNewFile(file);
 			}
 		}

@@ -54,11 +54,25 @@ public class LoggingView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 		
 		// init Log4J logger
-		PropertyConfigurator.configure(ConfigReader.getProperties());
+		try {
+			PropertyConfigurator.configure(ConfigReader.getProperties());
+		} catch (final Exception e) {
+			System.err.println("Failed to configure log4j logger");
+			logger.error("Failed to configure log4j logger", e);
+		}
 		
-		Workbench.getInstance().getActiveWorkbenchWindow().getPartService().addPartListener(this.listener);
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(this.resourceListener,
+		try {
+			Workbench.getInstance().getActiveWorkbenchWindow().getPartService().addPartListener(this.listener);
+		} catch (final Exception e) {
+			logger.error("Failed to register part listener", e);
+		}
+		
+		try {
+			ResourcesPlugin.getWorkspace().addResourceChangeListener(this.resourceListener,
 				IResourceChangeEvent.POST_CHANGE);
+		} catch (final Exception e) {
+			logger.error("Failed to register resource listener", e);
+		}
 		
 		// create file sender thread
 		try {
@@ -68,7 +82,11 @@ public class LoggingView extends ViewPart {
 		}
 
 		// init loggers for actions - see config.properties
-		EclipseActionMonitor.init();
+		try {
+			EclipseActionMonitor.init();
+		} catch (final Exception e) {
+			logger.error("Failed to init EclipseActionMonitor", e);
+		}
 
 		// init context change dialog
 //		final Shell shell = parent.getShell();

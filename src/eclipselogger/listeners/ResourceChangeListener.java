@@ -19,19 +19,19 @@ public class ResourceChangeListener implements IResourceChangeListener {
 			switch (event.getType()) {
 			case IResourceChangeEvent.POST_CHANGE:
 				if (res != null) {
-					this.logger.info("Resource changed: " + res.getProjectRelativePath().toOSString());
+					this.logger.debug("Resource changed: " + res.getProjectRelativePath().toOSString());
 				}
 				this.handler.startDeltaHandling();
 				event.getDelta().accept(this.handler);
 				this.handler.stopDeltaHandling();
 				break;
 			case IResourceChangeEvent.POST_BUILD:
-				System.out.println("Build complete.");
+				this.logger.debug("Build complete");
 				// event.getDelta().accept(handler);
 				break;
 			}
 		} catch (final Exception e) {
-			e.printStackTrace();
+			this.logger.error("Exception occured during delta handling", e);
 		}
 
 	}

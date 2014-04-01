@@ -35,22 +35,26 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 	}
 	
 	private void handleMoreResourceChanges() {
-		if (this.actualDelta.size() != 2) {
-			this.logger.debug("Something is wrong, only 2 changes should be in one delta");
-		} else {
-			final DeltaEntry firstEntry = this.actualDelta.get(0);
-			final DeltaEntry secondEntry = this.actualDelta.get(1);
-			if ((firstEntry.getType() == IResourceDelta.REMOVED && secondEntry.getType() == IResourceDelta.ADDED)
-					|| (firstEntry.getType() == IResourceDelta.ADDED && secondEntry.getType() == IResourceDelta.REMOVED)) {
-				handleRefactoring(firstEntry, secondEntry);
+		try {
+			if (this.actualDelta.size() != 2) {
+				this.logger.debug("Something is wrong, only 2 changes should be in one delta");
 			} else {
-				this.logger.debug(">>> Something is wrong, 2 changes were made, but not refactoring!!!");
-				this.logger.debug("First: " + firstEntry.getType() + ", second: " + secondEntry.getType());
+				final DeltaEntry firstEntry = this.actualDelta.get(0);
+				final DeltaEntry secondEntry = this.actualDelta.get(1);
+				if ((firstEntry.getType() == IResourceDelta.REMOVED && secondEntry.getType() == IResourceDelta.ADDED)
+						|| (firstEntry.getType() == IResourceDelta.ADDED && secondEntry.getType() == IResourceDelta.REMOVED)) {
+					handleRefactoring(firstEntry, secondEntry);
+				} else {
+					this.logger.debug(">>> Something is wrong, 2 changes were made, but not refactoring!!!");
+					this.logger.debug("First: " + firstEntry.getType() + ", second: " + secondEntry.getType());
+				}
 			}
+		} catch (final Exception e) {
+			this.logger.error("Error in handleMoreResourceChanges()", e);
 		}
 	}
 	
-	private void handleRefactoring(final DeltaEntry firstEntry, final DeltaEntry secondEntry) {
+	private void handleRefactoring(final DeltaEntry firstEntry, final DeltaEntry secondEntry) throws Exception {
 		if (firstEntry.getResource().getType() == IResource.FILE && secondEntry.getResource().getType() == IResource.FILE) {
 			if (firstEntry.getType() == IResourceDelta.REMOVED) {
 				EclipseActionMonitor.refactorFile((IFile)firstEntry.getResource(), (IFile)secondEntry.getResource());
@@ -69,22 +73,26 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 	
 	private void handleOneResourceChange() {
 		final DeltaEntry entry = this.actualDelta.get(0);
-		if (entry != null) {
-			final IResource resource = entry.getResource();
-			switch(entry.getType()) {
-			case IResourceDelta.ADDED:
-				handleResourceAdded(resource);
-				break;
-			case IResourceDelta.REMOVED:
-				handleResourceRemoved(resource);
-				break;
-			case IResourceDelta.CHANGED:
-				// We don't handle saved file action any more
-				// handleResourceChanged(resource);
-				break;
+		try {
+			if (entry != null) {
+				final IResource resource = entry.getResource();
+				switch (entry.getType()) {
+				case IResourceDelta.ADDED:
+					handleResourceAdded(resource);
+					break;
+				case IResourceDelta.REMOVED:
+					handleResourceRemoved(resource);
+					break;
+				case IResourceDelta.CHANGED:
+					// We don't handle saved file action any more
+					// handleResourceChanged(resource);
+					break;
+				}
 			}
+		} catch (final Exception e) {
+			this.logger.error("handleOneResourceChange()", e);
 		}
-		
+
 	}
 	
 	private void handleResourceAdded(final IResource res) {
@@ -117,23 +125,27 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 	public boolean visit(final IResourceDelta delta) throws CoreException {
 		final IResource res = delta.getResource();
 		boolean result = true;
-		
-		switch (delta.getKind()) {
-		case IResourceDelta.ADDED:
-			result = handleAddVisited(res);
-			break;
-		case IResourceDelta.REMOVED:
-			result = handleRemoveVisited(res);
-			break;
-		case IResourceDelta.CHANGED:
-			result = handleChangeVisited(res);
-			break;
+
+		try {
+			switch (delta.getKind()) {
+			case IResourceDelta.ADDED:
+				result = handleAddVisited(res);
+				break;
+			case IResourceDelta.REMOVED:
+				result = handleRemoveVisited(res);
+				break;
+			case IResourceDelta.CHANGED:
+				result = handleChangeVisited(res);
+				break;
+			}
+		} catch (final Exception e) {
+			this.logger.error("Error occured during delta visit()", e);
 		}
-		
+
 		return result;
 	}
 	 
-	private boolean handleChangeVisited(final IResource res) {
+	private boolean handleChangeVisited(final IResource res) throws Exception {
 		boolean result = true;
 		if (res.getType() == IResource.FILE) {
 			if (FileValidator.shouldBeFileLogged(res)) {
@@ -145,7 +157,7 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 		return result;
 	}
 
-	private boolean handleRemoveVisited(final IResource res) {
+	private boolean handleRemoveVisited(final IResource res) throws Exception {
 		boolean result = true;
 		if (res.getType() == IResource.FILE) {
 			if (FileValidator.shouldBeFileLogged(res)) {
@@ -168,7 +180,7 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 		return result;
 	}
 
-	private boolean handleAddVisited(final IResource res) {
+	private boolean handleAddVisited(final IResource res) throws Exception {
 		boolean result = true;
 		if (res.getType() == IResource.FILE) {
 			if (FileValidator.shouldBeFileLogged(res)) {
