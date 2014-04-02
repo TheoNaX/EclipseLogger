@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IFile;
 
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
+import eclipselogger.events.EclipseFile;
 import eclipselogger.events.WorkingFile;
 import eclipselogger.utils.FileChanges;
 import eclipselogger.utils.FileValidator;
@@ -28,11 +29,11 @@ public class DeleteFileAction extends EclipseAction {
 	// TODO implement count of deleted files within some period ???
 	
 	public DeleteFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
-			final int recentSameActionsCount, final IFile deletedFile, final IFile previoiusFile, final WorkingFile workFile, final int packageDistance) {
+			final int recentSameActionsCount, final IFile deletedFile, final EclipseFile previoiusFile, final WorkingFile workFile, final int packageDistance) {
 		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.deletedFile = deletedFile.getProjectRelativePath().toOSString();
-		if (this.previousFile != null) {
-			this.previousFile = previoiusFile.getProjectRelativePath().toOSString();
+		if (previoiusFile != null) {
+			this.previousFile = previoiusFile.getRelativePath();
 		}
 		this.samePackage = PackageUtils.checkIfSamePackage(deletedFile, previoiusFile);
 		this.sameProject = PackageUtils.checkIfSameProject(deletedFile, previoiusFile);

@@ -17,6 +17,10 @@ public class OpenFileListener implements IPartListener2 {
 	private String lastSwitched;
 	private final Logger logger = Logger.getLogger(OpenFileListener.class);
 
+	// TODO how to force not to show switch if delete action or close action performed on opened file
+	// some kind of lock
+	// lock when this operation is performed on opened file
+	// unlock when operation finished
 	@Override
 	public void partActivated(final IWorkbenchPartReference partRef) {
 		final IWorkbenchPart part = partRef.getPart(false);

@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IFile;
 
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
+import eclipselogger.events.EclipseFile;
 import eclipselogger.events.WorkingFile;
 import eclipselogger.utils.FileChanges;
 import eclipselogger.utils.FileValidator;
@@ -25,11 +26,11 @@ public class CloseFileAction extends EclipseAction {
 	private long workingTime = 0;
 	
 	public CloseFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
-			final int recentSameActionsCount, final IFile closedFile, final IFile previousFile, final WorkingFile workFile, final int packageDistance) {
+			final int recentSameActionsCount, final IFile closedFile, final EclipseFile previousFile, final WorkingFile workFile, final int packageDistance) {
 		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.closedFile = closedFile.getProjectRelativePath().toOSString();
 		if (previousFile != null) {
-			this.previousFile = previousFile.getProjectRelativePath().toOSString();
+			this.previousFile = previousFile.getRelativePath();
 		}
 		this.samePackage = PackageUtils.checkIfSamePackage(closedFile, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(closedFile, previousFile);

@@ -40,8 +40,9 @@ import eclipselogger.utils.PackageDistanceCalculator;
 
 public class EclipseActionMonitor {
 	
-	private static IFile actualFile;
-	private static IFile previousFile;
+	private static EclipseFile actualFile;
+	private static EclipseFile previousFile;
+	
 	private static long fileWorkStart;
 	private static EclipseAction lastAction;
 	private static long lastActionTime;
@@ -101,12 +102,23 @@ public class EclipseActionMonitor {
 	
 	
 	public static void setActualFile(final IFile file) {
+		if (file == null) {
+			logger.error(">>> setActualFile() called with null parameter");
+			return;
+		}
 		updateActualFile(file);
 		
 		// TODO how to find out if the file is really worked with, implement some time filter
 		// programmer must work with file at least 5 seconds
 		previousFile = actualFile;
-		actualFile = file;
+		if (previousFile == null) {
+			logger.debug(">>>> Previous file is null!");
+		} else {
+			logger.debug(">>>> Previous file: " + previousFile.getRelativePath());
+		}
+		
+		actualFile = new EclipseFile(file);
+		logger.debug("Actual file: " + actualFile.getRelativePath());
 		
 		// store file content of opened / switched file
 		setActualFileContent(file);
@@ -122,13 +134,14 @@ public class EclipseActionMonitor {
 	private static void setActualFileContent(final IFile file) {
 		final String content = FileUtilities.fileContentToString(file);
 		fileContentCache.setActualFileText(content);
+		fileContentCache.applyChangedContent(content);
 	}
 	
-	public static IFile getActualFile() {
+	public static EclipseFile getActualFile() {
 		return actualFile;
 	}
 	
-	public static IFile getPreviousFile() {
+	public static EclipseFile getPreviousFile() {
 		return previousFile;
 	}
 	
@@ -147,11 +160,11 @@ public class EclipseActionMonitor {
 			final long stopWork = System.currentTimeMillis();
 			final long workTime = stopWork - fileWorkStart;
 			try {
-				final WorkingFile workFile = workingFiles.get(actualFile.getProjectRelativePath().toOSString());
+				final WorkingFile workFile = workingFiles.get(actualFile.getRelativePath());
 				if (workFile != null) {
 					workFile.increaseWorkingTime(workTime);
 
-					final String fileContent = FileUtilities.fileContentToString(actualFile);
+					final String fileContent = fileContentCache.getChangedContent();
 					final FileChanges changes = FileComparator.getFileChanges(fileContentCache.getActualFileText(),
 							fileContent);
 
@@ -167,20 +180,20 @@ public class EclipseActionMonitor {
 		}
 	}
 	
-	public static void closeFile(final IFile file) {
+	public static synchronized void closeFile(final IFile file) {
 		if (file == null) {
 			logger.error("closeFile() called with null file");
 			return;
 		}
 
 		final WorkingFile closed = workingFiles.remove(file.getProjectRelativePath().toOSString());
-		IFile previous = null;
+		EclipseFile previous = null;
 
 		try {
-			if (file.equals(getActualFile())) {
-				previous = getPreviousFile();
+			if (actualFile != null && actualFile.equals(file)) {
+				previous = previousFile;
 			} else {
-				previous = getActualFile();
+				previous = actualFile;
 			}
 
 			// if last action was delete file action and file equals opened file,
@@ -200,7 +213,7 @@ public class EclipseActionMonitor {
 			final CloseFileAction closeAction = new CloseFileAction(timeSinceLastAction, lastAction, lastActions,
 					recentCount, file, previous, closed, packageDistance);
 			closeAction.applyContext(taskContext);
-			closeAction.setResource(file);
+			closeAction.setResource(new EclipseResource(file));
 			showContextChangeDialog(closeAction);
 			afterAction(closeAction);
 		} catch (final Exception e) {
@@ -233,7 +246,7 @@ public class EclipseActionMonitor {
 			final OpenNewFileAction openAction = new OpenNewFileAction(timeSinceLastAction, lastAction, lastActions,
 					recentCount, file, previousFile, packageDistance);
 			openAction.applyContext(taskContext);
-			openAction.setResource(file);
+			openAction.setResource(new EclipseResource(file));
 			showContextChangeDialog(openAction);
 			afterAction(openAction); // TODO check if needed
 		} catch (final Exception e) {
@@ -241,7 +254,7 @@ public class EclipseActionMonitor {
 		}
 	}
 	
-	public static void switchToFile(final IFile file) {
+	public synchronized static void switchToFile(final IFile file) {
 		if ((file == null) || (actualFile != null && actualFile.equals(file))) {
 			logger.debug("Switch executed on file already switched");
 			return;
@@ -257,7 +270,7 @@ public class EclipseActionMonitor {
 			final SwitchToFileAction switchAction = new SwitchToFileAction(timeSinceLastAction, lastAction,
 					lastActions, recentCount, file, previousFile, packageDistance);
 			switchAction.applyContext(taskContext);
-			switchAction.setResource(file);
+			switchAction.setResource(new EclipseResource(file));
 			showContextChangeDialog(switchAction);
 			afterAction(switchAction);
 		} catch (final Exception e) {
@@ -280,7 +293,7 @@ public class EclipseActionMonitor {
 			final RefactorPackageAction refPackAction = new RefactorPackageAction(timeSinceLastAction, lastAction, lastActions, recentCount, oldPack, newPack, previousFile, packageDistance);
 			showContextChangeDialog(refPackAction);
 			refPackAction.applyContext(taskContext);
-			refPackAction.setResource(oldPack);
+			refPackAction.setResource(new EclipseResource(oldPack));
 			afterAction(refPackAction);
 		} catch (final Exception e) {
 			logger.error("refactorPackage()", e);
@@ -303,7 +316,7 @@ public class EclipseActionMonitor {
 			final RefactorFileAction refFileAction = new RefactorFileAction(timeSinceLastAction, lastAction,
 					lastActions, recentCount, oldFile, newFile, previousFile, packageDistance);
 			refFileAction.applyContext(taskContext);
-			refFileAction.setResource(oldFile);
+			refFileAction.setResource(new EclipseResource(oldFile));
 			showContextChangeDialog(refFileAction);
 			afterAction(refFileAction);
 		} catch (final Exception e) {
@@ -325,7 +338,7 @@ public class EclipseActionMonitor {
 			final AddPackageAction action = new AddPackageAction(timeSinceLastAction, lastAction, lastActions,
 					recentCount, folder, actualFile, packageDistance);
 			action.applyContext(taskContext);
-			action.setResource(folder);
+			action.setResource(new EclipseResource(folder));
 			showContextChangeDialog(action);
 			afterAction(action);
 		} catch (final Exception e) {
@@ -333,7 +346,7 @@ public class EclipseActionMonitor {
 		}
 	}
 	
-	public static void deleteFolder(final IFolder folder) {
+	public static synchronized void deleteFolder(final IFolder folder) {
 		if (folder == null) {
 			logger.error("deleteFolder() called with null parameter !");
 			return;
@@ -348,10 +361,10 @@ public class EclipseActionMonitor {
 			final DeletePackageAction action = new DeletePackageAction(timeSinceLastAction, lastAction, lastActions,
 					recentCount, folder, actualFile, packageDistance);
 			action.applyContext(taskContext);
-			action.setResource(folder);
+			action.setResource(new EclipseResource(folder));
 			showContextChangeDialog(action);
 			afterAction(action);
-		} catch (final Exception e) {
+		} catch (final Throwable e) {
 			logger.error("deleteFolder()", e);
 		}
 	}
@@ -371,7 +384,7 @@ public class EclipseActionMonitor {
 			final AddFileAction action = new AddFileAction(timeSinceLastAction, lastAction, lastActions, recentCount,
 					file, actualFile, packageDistance);
 			action.applyContext(taskContext);
-			action.setResource(file);
+			action.setResource(new EclipseResource(file));
 			showContextChangeDialog(action);
 			afterAction(action);
 		} catch (final Exception e) {
@@ -379,13 +392,14 @@ public class EclipseActionMonitor {
 		}
 	}
 	
-	public static void deleteFile(final IFile file) {
+	// TODO why previous file is null
+	public static synchronized void deleteFile(final IFile file) {
 		if (file == null) {
 			logger.error("deleteFile() called with null parameter");
 			return;
 		}
-		IFile previous;
-		if (file.equals(actualFile)) {
+		EclipseFile previous;
+		if (actualFile != null && actualFile.equals(file)) {
 			previous = previousFile;
 		} else {
 			previous = actualFile;
@@ -400,10 +414,10 @@ public class EclipseActionMonitor {
 			final DeleteFileAction deleteFileAction = new DeleteFileAction(timeSinceLastAction, lastAction,
 					lastActions, recentCount, file, previous, deleted, packageDistance);
 			deleteFileAction.applyContext(taskContext);
-			deleteFileAction.setResource(file);
+			deleteFileAction.setResource(new EclipseResource(file));
 			showContextChangeDialog(deleteFileAction);
 			afterAction(deleteFileAction);
-		} catch (final Exception e) {
+		} catch (final Throwable e) {
 			logger.error("deleteFile()", e);
 		}
 	}
@@ -421,7 +435,7 @@ public class EclipseActionMonitor {
 		
 		final AddProjectAction action = new AddProjectAction(timeSinceLastAction, lastAction, lastActions, recentCount, project, 0);
 		action.applyContext(taskContext);
-		action.setResource(project);
+		action.setResource(new EclipseResource(project));
 		showContextChangeDialog(action);
 		afterAction(action);
 	}
@@ -454,6 +468,10 @@ public class EclipseActionMonitor {
 		} else {
 			return PackageDistanceCalculator.calculatePackageDistance(res, lastAction.getResource());
 		}
+	}
+	
+	public static void applyContentChangesForActualFile(final String content) {
+		fileContentCache.applyChangedContent(content);
 	}
 	
 //	public static void initContextDialog(final ContextChangeDialog dialog) {

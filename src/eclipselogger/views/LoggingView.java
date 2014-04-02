@@ -104,5 +104,11 @@ public class LoggingView extends ViewPart {
 	@Override
 	public void dispose() {
 		this.fileSender.stopSenderThread();
+		try {
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(this.resourceListener);
+			Workbench.getInstance().getActiveWorkbenchWindow().getPartService().removePartListener(this.listener);
+		} catch (final Throwable e) {
+			logger.error("Error in dispose", e);
+		}
 	}
 }

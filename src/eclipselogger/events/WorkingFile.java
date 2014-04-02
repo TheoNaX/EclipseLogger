@@ -5,20 +5,20 @@ import org.eclipse.core.resources.IFile;
 import eclipselogger.utils.FileChanges;
 
 public class WorkingFile {
-	private IFile file;
 	private long workingTime;
-	private FileChanges fileChanges = new FileChanges();
+	private final FileChanges fileChanges = new FileChanges();
+	private final String path;
 	
-	public WorkingFile(IFile file) {
-		this.file = file;
+	public WorkingFile(final IFile file) {
+		this.path = file.getProjectRelativePath().toOSString();
 	}
 	
-	public void increaseWorkingTime(long time) {
+	public void increaseWorkingTime(final long time) {
 		this.workingTime += time;
 	}
 	
 	public String getWorkingFileKey() {
-		return this.file.getProjectRelativePath().toOSString();
+		return this.path;
 	}
 	
 	public long getWorkingTime() {

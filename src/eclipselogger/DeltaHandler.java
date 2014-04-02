@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 import eclipselogger.events.EclipseActionMonitor;
+import eclipselogger.utils.FileUtilities;
 import eclipselogger.utils.FileValidator;
 
 public class DeltaHandler implements IResourceDeltaVisitor {
@@ -25,6 +26,7 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 	}
 	
 	public void stopDeltaHandling() {
+		try {
 		if (this.actualDelta.size() == 0) {
 			return;
 		} else if (this.actualDelta.size() == 1) {
@@ -32,9 +34,13 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 		} else {
 			handleMoreResourceChanges();
 		}
+		} catch (final Exception e) {
+			this.logger.error("stopDelta() error", e);
+		}
 	}
 	
 	private void handleMoreResourceChanges() {
+		this.logger.debug("########## handleMoreResourceChanges() start");
 		try {
 			if (this.actualDelta.size() != 2) {
 				this.logger.debug("Something is wrong, only 2 changes should be in one delta");
@@ -52,6 +58,7 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 		} catch (final Exception e) {
 			this.logger.error("Error in handleMoreResourceChanges()", e);
 		}
+		this.logger.debug("########## handleMoreResourceChanges() end");
 	}
 	
 	private void handleRefactoring(final DeltaEntry firstEntry, final DeltaEntry secondEntry) throws Exception {
@@ -72,6 +79,7 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 	}
 	
 	private void handleOneResourceChange() {
+		this.logger.debug("########### handleOneResourceChange start");
 		final DeltaEntry entry = this.actualDelta.get(0);
 		try {
 			if (entry != null) {
@@ -84,18 +92,27 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 					handleResourceRemoved(resource);
 					break;
 				case IResourceDelta.CHANGED:
-					// We don't handle saved file action any more
-					// handleResourceChanged(resource);
+					handleResourceChanged(resource);
 					break;
 				}
 			}
 		} catch (final Exception e) {
 			this.logger.error("handleOneResourceChange()", e);
 		}
+		this.logger.debug("########### handleOneResourceChange end");
 
 	}
 	
-	private void handleResourceAdded(final IResource res) {
+	private void handleResourceChanged(final IResource resource) {
+		if (resource instanceof IFile) {
+			final IFile file = (IFile) resource;
+			this.logger.debug(">>>>>>>>>>>>>>>>>>> Applying changes for file: " + file.getProjectRelativePath().toOSString());
+			final String fileContent = FileUtilities.fileContentToString(file);
+			EclipseActionMonitor.applyContentChangesForActualFile(fileContent);
+		}
+	}
+
+	private void handleResourceAdded(final IResource res) throws Exception {
 		if (res.getType() == IResource.FILE) {
 			final IFile file = (IFile) res;
 			this.logger.debug("File was added: " + file.getProjectRelativePath());
@@ -111,14 +128,18 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 		}
 	}
 	
-	private void handleResourceRemoved(final IResource res) {
+	private void handleResourceRemoved(final IResource res) throws Exception {
+		this.logger.debug("########### handleResourceRemoved start");
 		if (res.getType() == IResource.FILE) {
 			final IFile file = (IFile) res;
+			this.logger.debug("File deleted: " + res.getProjectRelativePath().toOSString());
 			EclipseActionMonitor.deleteFile(file);
 		} else if (res.getType() == IResource.FOLDER) {
 			final IFolder folder = (IFolder) res;
+			this.logger.debug("Folder deleted: " + res.getProjectRelativePath().toOSString());
 			EclipseActionMonitor.deleteFolder(folder);
 		}
+		this.logger.debug("########### handleResourceRemoved end");
 	}
 
 	@Override

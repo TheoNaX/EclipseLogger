@@ -7,15 +7,17 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 
+import eclipselogger.events.EclipseResource;
+
 public class PackageDistanceCalculator {
 	
 	
-	public static int calculatePackageDistance(final IResource first, final IResource second) {
+	public static int calculatePackageDistance(final IResource first, final EclipseResource second) {
 		final Vector<String> firstFoldersVector = getFoldersVector(first);
 		System.out.println(">>>> First resource: " + first.getProjectRelativePath().toOSString());
 		System.out.println(">>>>> First vector: " + firstFoldersVector);
 		final Vector<String> secondFoldersVector = getFoldersVector(second);
-		System.out.println(">>>> Second resource: " + second.getProjectRelativePath().toOSString());
+		System.out.println(">>>> Second resource: " + second.getProjectRelativePath());
 		System.out.println(">>>>> Second vector: " + secondFoldersVector);
 		final int firstLength = firstFoldersVector.size();
 		final int secondLength = secondFoldersVector.size();
@@ -36,6 +38,23 @@ public class PackageDistanceCalculator {
 			path = path.substring(0, path.indexOf(file.getName())-1);
 		} else {
 			path = res.getProjectRelativePath().toOSString();
+		}
+		final String[] folders = path.split(Pattern.quote(File.separator));
+		final Vector<String> result = new Vector<String>();
+		for (int i=0; i<folders.length; i++) {
+			result.add(folders[i]);
+		}
+		
+		return result;
+	}
+	
+	private static Vector<String> getFoldersVector(final EclipseResource res) {
+		String path = null;
+		if (res.getType() == IResource.FILE) {
+			path = res.getProjectRelativePath();
+			path = path.substring(0, path.indexOf(res.getFileName())-1);
+		} else {
+			path = res.getProjectRelativePath();
 		}
 		final String[] folders = path.split(Pattern.quote(File.separator));
 		final Vector<String> result = new Vector<String>();

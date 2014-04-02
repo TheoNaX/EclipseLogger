@@ -2,13 +2,22 @@ package eclipselogger.utils;
 
 public class ActualFileContentCache {
 	private String actualFileContent;
+	private String changedContent;
 	
 	public String getActualFileText() {
-		return actualFileContent;
+		return this.actualFileContent;
 	}
 	
-	public void setActualFileText(String content) {
-		actualFileContent = content;
+	public void applyChangedContent(final String content) {
+		this.changedContent = content;
+	}
+	
+	public String getChangedContent() {
+		return this.changedContent;
+	}
+	
+	public void setActualFileText(final String content) {
+		this.actualFileContent = content;
 	}
 
 }

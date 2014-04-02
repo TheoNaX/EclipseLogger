@@ -4,11 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
-import org.eclipse.core.resources.IResource;
-
 import eclipselogger.context.TaskContext;
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
+import eclipselogger.events.EclipseResource;
 import eclipselogger.utils.FileChanges;
 
 public abstract class EclipseAction {
@@ -22,7 +21,7 @@ public abstract class EclipseAction {
 	protected int recentSameActionsCount;
 	
 	protected int packageDistanceFromLastAction;
-	protected IResource resource;
+	protected EclipseResource resource;
 	
 	// task context specific features
 	protected FileChanges mostRecentFileChanges;
@@ -179,11 +178,11 @@ public abstract class EclipseAction {
 		return this.timestamp;
 	}
 	
-	public IResource getResource() {
+	public EclipseResource getResource() {
 		return this.resource;
 	}
 	
-	public void setResource(final IResource resource) {
+	public void setResource(final EclipseResource resource) {
 		this.resource = resource;
 	}
 	

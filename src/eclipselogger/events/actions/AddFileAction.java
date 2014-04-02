@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IFile;
 
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
+import eclipselogger.events.EclipseFile;
 import eclipselogger.utils.FileValidator;
 import eclipselogger.utils.PackageUtils;
 
@@ -24,11 +25,11 @@ public class AddFileAction extends EclipseAction {
 	
 	
 	public AddFileAction(final long timeSinceLastAction, final EclipseAction previousAction, 
-			final String recentActions, final int recentSameActionsCount, final IFile addedFile, final IFile previousFile, final int packageDistance) {
+			final String recentActions, final int recentSameActionsCount, final IFile addedFile, final EclipseFile previousFile, final int packageDistance) {
 		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.addedFile = addedFile.getProjectRelativePath().toOSString();
 		if (previousFile != null) {
-			this.previousFile = previousFile.getProjectRelativePath().toOSString();
+			this.previousFile = previousFile.getRelativePath();
 		}
 		this.samePackage = PackageUtils.checkIfSamePackage(addedFile, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(addedFile, previousFile);

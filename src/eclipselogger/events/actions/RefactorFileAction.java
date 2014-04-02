@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IFile;
 
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
+import eclipselogger.events.EclipseFile;
 import eclipselogger.utils.PackageUtils;
 
 public class RefactorFileAction extends EclipseAction {
@@ -26,13 +27,13 @@ public class RefactorFileAction extends EclipseAction {
 		
 	
 	public RefactorFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
-			final int recentSameActionsCount, final IFile oldFile, final IFile newFile, final IFile previousFile, final int packageDistance) {
+			final int recentSameActionsCount, final IFile oldFile, final IFile newFile, final EclipseFile previousFile, final int packageDistance) {
 		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.oldFilePath = oldFile.getProjectRelativePath().toOSString();
 		this.newFilePath = newFile.getProjectRelativePath().toOSString();
 		this.refactorType = resolveRefactorType(oldFile, newFile);
 		if (previousFile != null) {
-			this.previousFile = previousFile.getProjectRelativePath().toOSString();
+			this.previousFile = previousFile.getRelativePath();
 		}
 		this.samePackage = PackageUtils.checkIfSamePackage(oldFile, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(oldFile, previousFile);
