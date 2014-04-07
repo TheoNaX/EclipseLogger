@@ -3,11 +3,10 @@ package eclipselogger.events.actions;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.eclipse.core.resources.IFolder;
-
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
-import eclipselogger.events.EclipseFile;
+import eclipselogger.resources.EclipseFile;
+import eclipselogger.resources.EclipseFolder;
 import eclipselogger.utils.PackageUtils;
 
 public class RefactorPackageAction extends EclipseAction {
@@ -34,16 +33,16 @@ public class RefactorPackageAction extends EclipseAction {
 	}
 
 	public RefactorPackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
-			final int recentSameActionsCount, final IFolder oldPackage, final IFolder newPackage, final EclipseFile previousFile, final int packageDistance) {
+			final int recentSameActionsCount, final EclipseFolder oldPackage, final EclipseFolder newPackage, final EclipseFile previousFile, final int packageDistance) {
 		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.refactorType = resolveRefactorType(oldPackage, newPackage);
 		if (previousFile != null) {
-			this.previousFile = previousFile.getRelativePath();
+			this.previousFile = previousFile.getProjectRelativePath();
 		}
 		this.samePackage = PackageUtils.checkIfSamePackage(oldPackage, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(oldPackage, previousFile);
-		this.oldPackagePath = oldPackage.getProjectRelativePath().toOSString();
-		this.newPackagePath = newPackage.getProjectRelativePath().toOSString();
+		this.oldPackagePath = oldPackage.getProjectRelativePath();
+		this.newPackagePath = newPackage.getProjectRelativePath();
 	}
 	
 	public RefactorPackageAction(final ResultSet rs) throws SQLException {
@@ -61,7 +60,7 @@ public class RefactorPackageAction extends EclipseAction {
 		return this.refactorType;
 	}
 	
-	private static String resolveRefactorType(final IFolder oldFolder, final IFolder newFolder) {
+	private static String resolveRefactorType(final EclipseFolder oldFolder, final EclipseFolder newFolder) {
 		if (oldFolder == null || newFolder == null) {
 			return null;
 		}

@@ -3,10 +3,9 @@ package eclipselogger.events.actions;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.eclipse.core.resources.IProject;
-
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
+import eclipselogger.resources.EclipseProject;
 
 public class AddProjectAction extends EclipseAction {
 	
@@ -15,7 +14,7 @@ public class AddProjectAction extends EclipseAction {
 	private final String projectName;
 	
 	public AddProjectAction(final long timeSinceLastAction, final EclipseAction previousAction, 
-			final String recentActions, final int recentSameActionsCount, final IProject project, final int packageDistance) {
+			final String recentActions, final int recentSameActionsCount, final EclipseProject project, final int packageDistance) {
 		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
 		this.projectName = project.getName();
 	}

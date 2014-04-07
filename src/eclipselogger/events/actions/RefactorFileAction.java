@@ -3,11 +3,9 @@ package eclipselogger.events.actions;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.eclipse.core.resources.IFile;
-
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
-import eclipselogger.events.EclipseFile;
+import eclipselogger.resources.EclipseFile;
 import eclipselogger.utils.PackageUtils;
 
 public class RefactorFileAction extends EclipseAction {
@@ -27,17 +25,17 @@ public class RefactorFileAction extends EclipseAction {
 		
 	
 	public RefactorFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
-			final int recentSameActionsCount, final IFile oldFile, final IFile newFile, final EclipseFile previousFile, final int packageDistance) {
+			final int recentSameActionsCount, final EclipseFile oldFile, final EclipseFile newFile, final EclipseFile previousFile, final int packageDistance) {
 		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
-		this.oldFilePath = oldFile.getProjectRelativePath().toOSString();
-		this.newFilePath = newFile.getProjectRelativePath().toOSString();
+		this.oldFilePath = oldFile.getProjectRelativePath();
+		this.newFilePath = newFile.getProjectRelativePath();
 		this.refactorType = resolveRefactorType(oldFile, newFile);
 		if (previousFile != null) {
-			this.previousFile = previousFile.getRelativePath();
+			this.previousFile = previousFile.getProjectRelativePath();
 		}
 		this.samePackage = PackageUtils.checkIfSamePackage(oldFile, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(oldFile, previousFile);
-		this.refactoredFile = newFile.getProjectRelativePath().toOSString();
+		this.refactoredFile = newFile.getProjectRelativePath();
 	}
 	
 	public RefactorFileAction(final ResultSet rs) throws SQLException {
@@ -63,11 +61,11 @@ public class RefactorFileAction extends EclipseAction {
 		return this.refactorType;
 	}
 	
-	private static String resolveRefactorType(final IFile oldFile, final IFile newFile) {
+	private static String resolveRefactorType(final EclipseFile oldFile, final EclipseFile newFile) {
 		if (oldFile == null || newFile == null) {
 			return null;
 		}
-		if (oldFile.getName().equals(newFile.getName())) {
+		if (oldFile.getFileName().equals(newFile.getFileName())) {
 			return FILE_MOVE;
 		} else {
 			return FILE_RENAME;

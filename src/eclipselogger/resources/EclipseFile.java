@@ -1,8 +1,11 @@
-package eclipselogger.events;
+package eclipselogger.resources;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 
-public class EclipseFile {
+import eclipselogger.events.EclipseResource;
+
+public class EclipseFile extends EclipseResource {
 	
 	private final String relativePath;
 	private final String fileName;
@@ -14,13 +17,15 @@ public class EclipseFile {
 		this.fileName = file.getName();
 		this.projectName = file.getProject().getName();
 		this.fileExtension = file.getFileExtension();
+		this.resourceType = IResource.FILE;
 	}
 	
-	public String getRelativePath() {
+	@Override
+	public String getProjectRelativePath() {
 		return this.relativePath;
 	}
 	
-	public String getName() {
+	public String getFileName() {
 		return this.fileName;
 	}
 	
@@ -34,13 +39,13 @@ public class EclipseFile {
 	
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null || !(obj instanceof IFile)) {
+		if (obj == null || !(obj instanceof EclipseFile)) {
 			return false;
 		}
-		final IFile file = (IFile) obj;
+		final EclipseFile file = (EclipseFile) obj;
 		boolean result = false;
 		if (file != null && this.relativePath != null) {
-			if (this.relativePath.equalsIgnoreCase(file.getProjectRelativePath().toOSString())) {
+			if (this.relativePath.equalsIgnoreCase(file.getProjectRelativePath())) {
 				result = true;
 			}
 		}

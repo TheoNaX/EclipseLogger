@@ -3,12 +3,10 @@ package eclipselogger.events.actions;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.eclipse.core.resources.IFile;
-
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
-import eclipselogger.events.EclipseFile;
 import eclipselogger.events.WorkingFile;
+import eclipselogger.resources.EclipseFile;
 import eclipselogger.utils.FileChanges;
 import eclipselogger.utils.FileValidator;
 import eclipselogger.utils.PackageUtils;
@@ -26,11 +24,11 @@ public class CloseFileAction extends EclipseAction {
 	private long workingTime = 0;
 	
 	public CloseFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
-			final int recentSameActionsCount, final IFile closedFile, final EclipseFile previousFile, final WorkingFile workFile, final int packageDistance) {
+			final int recentSameActionsCount, final EclipseFile closedFile, final EclipseFile previousFile, final WorkingFile workFile, final int packageDistance) {
 		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
-		this.closedFile = closedFile.getProjectRelativePath().toOSString();
+		this.closedFile = closedFile.getProjectRelativePath();
 		if (previousFile != null) {
-			this.previousFile = previousFile.getRelativePath();
+			this.previousFile = previousFile.getProjectRelativePath();
 		}
 		this.samePackage = PackageUtils.checkIfSamePackage(closedFile, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(closedFile, previousFile);

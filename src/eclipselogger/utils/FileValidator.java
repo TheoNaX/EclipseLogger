@@ -4,7 +4,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 
-import eclipselogger.events.EclipseFile;
+import eclipselogger.resources.EclipseFile;
 
 public class FileValidator {
 	
@@ -42,7 +42,7 @@ public class FileValidator {
 		return false;
 	}
 	
-	public static boolean haveFilesTheSameExtension(final IFile firstFile, final EclipseFile secondFile) {
+	public static boolean haveFilesTheSameExtension(final EclipseFile firstFile, final EclipseFile secondFile) {
 		boolean result = false;
 		if (firstFile == null || secondFile == null) {
 			return result;

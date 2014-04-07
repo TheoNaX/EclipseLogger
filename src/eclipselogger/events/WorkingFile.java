@@ -1,7 +1,6 @@
 package eclipselogger.events;
 
-import org.eclipse.core.resources.IFile;
-
+import eclipselogger.resources.EclipseFile;
 import eclipselogger.utils.FileChanges;
 
 public class WorkingFile {
@@ -9,8 +8,8 @@ public class WorkingFile {
 	private final FileChanges fileChanges = new FileChanges();
 	private final String path;
 	
-	public WorkingFile(final IFile file) {
-		this.path = file.getProjectRelativePath().toOSString();
+	public WorkingFile(final EclipseFile file) {
+		this.path = file.getProjectRelativePath();
 	}
 	
 	public void increaseWorkingTime(final long time) {

@@ -3,11 +3,10 @@ package eclipselogger.events.actions;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.eclipse.core.resources.IFolder;
-
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
-import eclipselogger.events.EclipseFile;
+import eclipselogger.resources.EclipseFile;
+import eclipselogger.resources.EclipseFolder;
 import eclipselogger.utils.PackageUtils;
 
 public class AddPackageAction extends EclipseAction {
@@ -20,11 +19,11 @@ public class AddPackageAction extends EclipseAction {
 	private final boolean sameProject;
 	
 	public AddPackageAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, 
-			final IFolder addedPackage, final EclipseFile previousFile, final int packageDistance) {
+			final EclipseFolder addedPackage, final EclipseFile previousFile, final int packageDistance) {
 		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
-		this.addedPackage = addedPackage.getProjectRelativePath().toOSString();
+		this.addedPackage = addedPackage.getProjectRelativePath();
 		if (previousFile != null) {
-			this.previousFile = previousFile.getRelativePath();
+			this.previousFile = previousFile.getProjectRelativePath();
 		}
 		this.samePackage = PackageUtils.checkIfSamePackage(addedPackage, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(addedPackage, previousFile);

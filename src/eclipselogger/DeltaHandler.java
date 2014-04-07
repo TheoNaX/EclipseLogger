@@ -13,6 +13,10 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 import eclipselogger.events.EclipseActionMonitor;
+import eclipselogger.resources.EclipseFile;
+import eclipselogger.resources.EclipseFolder;
+import eclipselogger.resources.EclipseProject;
+import eclipselogger.resources.ResourceBuilder;
 import eclipselogger.utils.FileUtilities;
 import eclipselogger.utils.FileValidator;
 
@@ -63,16 +67,21 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 	
 	private void handleRefactoring(final DeltaEntry firstEntry, final DeltaEntry secondEntry) throws Exception {
 		if (firstEntry.getResource().getType() == IResource.FILE && secondEntry.getResource().getType() == IResource.FILE) {
+			final EclipseFile firstFile = ResourceBuilder.buildEclipseFile((IFile)firstEntry.getResource());
+			final EclipseFile secondFile = ResourceBuilder.buildEclipseFile((IFile)secondEntry.getResource());
 			if (firstEntry.getType() == IResourceDelta.REMOVED) {
-				EclipseActionMonitor.refactorFile((IFile)firstEntry.getResource(), (IFile)secondEntry.getResource());
+				 
+				EclipseActionMonitor.refactorFile(firstFile, secondFile);
 			} else {
-				EclipseActionMonitor.refactorFile((IFile)secondEntry.getResource(), (IFile)firstEntry.getResource());
+				EclipseActionMonitor.refactorFile(secondFile, firstFile);
 			}
 		} else if (firstEntry.getResource().getType() == IResource.FOLDER && secondEntry.getResource().getType() == IResource.FOLDER) {
+			final EclipseFolder firstFolder = ResourceBuilder.buildEclipseFolder((IFolder)firstEntry.getResource());
+			final EclipseFolder secondFolder = ResourceBuilder.buildEclipseFolder((IFolder)secondEntry.getResource());
 			if (firstEntry.getType() == IResourceDelta.REMOVED) {
-				EclipseActionMonitor.refactorPackage((IFolder)firstEntry.getResource(), (IFolder)secondEntry.getResource());
+				EclipseActionMonitor.refactorPackage(firstFolder, secondFolder);
 			} else {
-				EclipseActionMonitor.refactorPackage((IFolder)secondEntry.getResource(), (IFolder)firstEntry.getResource());
+				EclipseActionMonitor.refactorPackage(secondFolder, firstFolder);
 			}
 		}
 		
@@ -116,14 +125,17 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 		if (res.getType() == IResource.FILE) {
 			final IFile file = (IFile) res;
 			this.logger.debug("File was added: " + file.getProjectRelativePath());
-			EclipseActionMonitor.addFile(file);
+			final EclipseFile eFile = ResourceBuilder.buildEclipseFile(file);
+			EclipseActionMonitor.addFile(eFile);
 		} else if (res.getType() == IResource.FOLDER) {
 			final IFolder folder = (IFolder) res;
 			this.logger.debug("Folder / package was added: " + folder.getProjectRelativePath());
-			EclipseActionMonitor.addFolder(folder);
+			final EclipseFolder eFolder = ResourceBuilder.buildEclipseFolder(folder);
+			EclipseActionMonitor.addFolder(eFolder);
 		} else if (res.getType() == IResource.PROJECT) {
 			final IProject project = (IProject) res;
-			EclipseActionMonitor.addProject(project);
+			final EclipseProject eProject = ResourceBuilder.buildEclipseProject(project);
+			EclipseActionMonitor.addProject(eProject);
 			this.logger.debug("Project was added: " + project.getName());
 		}
 	}
@@ -133,11 +145,15 @@ public class DeltaHandler implements IResourceDeltaVisitor {
 		if (res.getType() == IResource.FILE) {
 			final IFile file = (IFile) res;
 			this.logger.debug("File deleted: " + res.getProjectRelativePath().toOSString());
-			EclipseActionMonitor.deleteFile(file);
+			
+			final EclipseFile eFile = ResourceBuilder.buildEclipseFile(file);
+			EclipseActionMonitor.deleteFile(eFile);
 		} else if (res.getType() == IResource.FOLDER) {
 			final IFolder folder = (IFolder) res;
 			this.logger.debug("Folder deleted: " + res.getProjectRelativePath().toOSString());
-			EclipseActionMonitor.deleteFolder(folder);
+			
+			final EclipseFolder eFolder = ResourceBuilder.buildEclipseFolder(folder);
+			EclipseActionMonitor.deleteFolder(eFolder);
 		}
 		this.logger.debug("########### handleResourceRemoved end");
 	}

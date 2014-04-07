@@ -10,6 +10,9 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import eclipselogger.events.EclipseActionMonitor;
+import eclipselogger.resources.EclipseFile;
+import eclipselogger.resources.ResourceBuilder;
+import eclipselogger.utils.FileUtilities;
 
 public class OpenFileListener implements IPartListener2 {
 	
@@ -33,7 +36,10 @@ public class OpenFileListener implements IPartListener2 {
 						|| (this.lastSwitched == null || !this.lastSwitched.equals(file.getProjectRelativePath().toOSString()))) {
 					this.logger.info("Switched to file: " + file.getProjectRelativePath().toOSString());
 					this.lastSwitched = file.getProjectRelativePath().toOSString();
-					EclipseActionMonitor.switchToFile(file);
+					
+					final EclipseFile eFile = ResourceBuilder.buildEclipseFile(file);
+					final String content = FileUtilities.fileContentToString(file);
+					EclipseActionMonitor.switchToFile(eFile, content);
 				}
 			}
 			this.lastOpened = null;
@@ -55,7 +61,8 @@ public class OpenFileListener implements IPartListener2 {
 			if (input instanceof IFileEditorInput) {
 				final IFile file = ((IFileEditorInput)input).getFile();
 				this.logger.debug("File closed: " + file.getProjectRelativePath().toOSString());
-				EclipseActionMonitor.closeFile(file);
+				final EclipseFile eFile = ResourceBuilder.buildEclipseFile(file);
+				EclipseActionMonitor.closeFile(eFile);
 			}
 		}
 	}
@@ -75,7 +82,9 @@ public class OpenFileListener implements IPartListener2 {
 				final IFile file = ((IFileEditorInput)input).getFile();
 				this.lastOpened = file.getProjectRelativePath().toOSString();
 				this.logger.debug("File opened: " + file.getProjectRelativePath().toOSString());
-				EclipseActionMonitor.openNewFile(file);
+				final EclipseFile eFile = ResourceBuilder.buildEclipseFile(file);
+				final String content = FileUtilities.fileContentToString(file);
+				EclipseActionMonitor.openNewFile(eFile, content);
 			}
 		}
 	}

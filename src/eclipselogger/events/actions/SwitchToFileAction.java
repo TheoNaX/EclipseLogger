@@ -3,11 +3,9 @@ package eclipselogger.events.actions;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.eclipse.core.resources.IFile;
-
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
-import eclipselogger.events.EclipseFile;
+import eclipselogger.resources.EclipseFile;
 import eclipselogger.utils.FileValidator;
 import eclipselogger.utils.PackageUtils;
 
@@ -23,11 +21,11 @@ public class SwitchToFileAction extends EclipseAction {
 	
 	
 	public SwitchToFileAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, 
-			final int recentSameActionsCount, final IFile openedFile, final EclipseFile previousFile, final int packageDistance) {
+			final int recentSameActionsCount, final EclipseFile openedFile, final EclipseFile previousFile, final int packageDistance) {
 		super(timeSinceLastAction, previousAction, recentActions, recentSameActionsCount, packageDistance);
-		this.switchedToFile = openedFile.getProjectRelativePath().toOSString();
+		this.switchedToFile = openedFile.getProjectRelativePath();
 		if (previousFile != null) {
-			this.previousFile = previousFile.getRelativePath();
+			this.previousFile = previousFile.getProjectRelativePath();
 		}
 		this.samePackage = PackageUtils.checkIfSamePackage(openedFile, previousFile);
 		this.sameProject = PackageUtils.checkIfSameProject(openedFile, previousFile);

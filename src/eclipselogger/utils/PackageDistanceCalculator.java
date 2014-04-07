@@ -8,13 +8,14 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 
 import eclipselogger.events.EclipseResource;
+import eclipselogger.resources.EclipseFile;
 
 public class PackageDistanceCalculator {
 	
 	
-	public static int calculatePackageDistance(final IResource first, final EclipseResource second) {
+	public static int calculatePackageDistance(final EclipseResource first, final EclipseResource second) {
 		final Vector<String> firstFoldersVector = getFoldersVector(first);
-		System.out.println(">>>> First resource: " + first.getProjectRelativePath().toOSString());
+		System.out.println(">>>> First resource: " + first.getProjectRelativePath());
 		System.out.println(">>>>> First vector: " + firstFoldersVector);
 		final Vector<String> secondFoldersVector = getFoldersVector(second);
 		System.out.println(">>>> Second resource: " + second.getProjectRelativePath());
@@ -51,8 +52,9 @@ public class PackageDistanceCalculator {
 	private static Vector<String> getFoldersVector(final EclipseResource res) {
 		String path = null;
 		if (res.getType() == IResource.FILE) {
+			final EclipseFile file = (EclipseFile) res;
 			path = res.getProjectRelativePath();
-			path = path.substring(0, path.indexOf(res.getFileName())-1);
+			path = path.substring(0, path.indexOf(file.getFileName())-1);
 		} else {
 			path = res.getProjectRelativePath();
 		}
