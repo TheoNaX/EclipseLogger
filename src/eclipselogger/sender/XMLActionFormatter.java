@@ -199,6 +199,23 @@ public class XMLActionFormatter implements ActionFormatterIF {
 		sb.append("</sameActionsTransitionsRatio>");
 		sb.append("\n");
 		
+		sb.append("<totalPackages>");
+		sb.append(action.getPackagesUsedCount());
+		sb.append("</totalPackages>");
+		sb.append("\n");
+		sb.append("<totalResources>");
+		sb.append(action.getResourcesUsedCount());
+		sb.append("</totalResources>");
+		sb.append("\n");
+		sb.append("<packagesWorkedBefore>");
+		sb.append(action.getPackagesWorkedBefore());
+		sb.append("</packagesWorkedBefore>");
+		sb.append("\n");
+		sb.append("<resourcesWorkedBefore>");
+		sb.append(action.getResourcesWorkedBefore());
+		sb.append("</resourcesWorkedBefore>");
+		sb.append("\n");
+		
 		return sb.toString();
 	}
 	

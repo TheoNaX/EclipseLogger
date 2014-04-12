@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 import eclipselogger.context.TaskContext;
 import eclipselogger.db.ActionDB;
 import eclipselogger.db.DynamicQuery;
@@ -11,6 +13,8 @@ import eclipselogger.events.EclipseResource;
 import eclipselogger.utils.FileChanges;
 
 public abstract class EclipseAction {
+	
+	private static Logger logger = Logger.getLogger(EclipseAction.class);
 	
 	protected long timeSinceLastAction;
 	protected int previousAction;
@@ -41,6 +45,12 @@ public abstract class EclipseAction {
 	protected long timeSinceLastSameAction;
 	protected int sameActionsTransitionsCount;
 	protected double sameActionsTransitionsRatio;
+	
+	protected int resourcesWorkedBefore;
+	protected int packagesWorkedBefore;
+	
+	protected int packagesUsedCount;
+	protected int resourcesUsedCount;
 	
 	public static final String TABLE_NAME = "eclipse_action";
 	
@@ -88,6 +98,11 @@ public abstract class EclipseAction {
 		this.timeSinceLastSameAction = rs.getLong(ActionDB.TIME_SINCE_LAST_SAME);
 		this.sameActionsTransitionsCount = rs.getInt(ActionDB.SAME_TRANSITIONS_COUNT);
 		this.sameActionsTransitionsRatio = rs.getDouble(ActionDB.SAME_TRANSITIONS_RATIO);
+		
+		this.packagesUsedCount = rs.getInt(ActionDB.TOTAL_PACKAGES);
+		this.resourcesUsedCount = rs.getInt(ActionDB.TOTAL_RESOURCES);
+		this.packagesWorkedBefore = rs.getInt(ActionDB.PACKAGE_WORKED_BEFORE);
+		this.resourcesWorkedBefore = rs.getInt(ActionDB.RESOURCE_WORKED_BEFORE);
 				
 	}
 	
@@ -148,6 +163,11 @@ public abstract class EclipseAction {
 		query.addColumnToSelect(ActionDB.PACKAGE_DISTANCE);
 		
 		// context specific
+		query.addColumnToSelect(ActionDB.TOTAL_PACKAGES);
+		query.addColumnToSelect(ActionDB.TOTAL_RESOURCES);
+		query.addColumnToSelect(ActionDB.PACKAGE_WORKED_BEFORE);
+		query.addColumnToSelect(ActionDB.RESOURCE_WORKED_BEFORE);
+		
 		query.addColumnToSelect(ActionDB.RECENT_LINES_CHANGED);
 		query.addColumnToSelect(ActionDB.RECENT_LINES_ADDED);
 		query.addColumnToSelect(ActionDB.RECENT_LINES_DELETED);
@@ -196,19 +216,21 @@ public abstract class EclipseAction {
 		applyContextToDurations(context);
 		
 		applyContextToActionCounts(context);
+		
+		applyContextToResources(context);
 	}
 	
 	private void applyContextToPackageDistances(final TaskContext context) {
 		final double avgDistance = context.getAveragePackageDistance();
-		System.out.println(">>>>>> package distance from last action: " + this.packageDistanceFromLastAction);
-		System.out.println(">>>>> average package distance: " + avgDistance);
+		logger.debug(">>>>>> package distance from last action: " + this.packageDistanceFromLastAction);
+		logger.debug(">>>>> average package distance: " + avgDistance);
 		this.averagePackageDistanceDiff = (avgDistance >= this.packageDistanceFromLastAction) ? (avgDistance - this.packageDistanceFromLastAction) : (this.packageDistanceFromLastAction - avgDistance);
-		System.out.println(">>>>>>>> averagePackageDistanceDiff: " + this.averagePackageDistanceDiff);
+		logger.debug(">>>>>>>> averagePackageDistanceDiff: " + this.averagePackageDistanceDiff);
 		
 		final double avgForAction = context.getAveragePackageDistanceForAction(getActionType());
-		System.out.println(">>>>> average package distance for action: " + avgForAction);
+		logger.debug(">>>>> average package distance for action: " + avgForAction);
 		this.averagePackageDistanceDiffForAction = (avgForAction >= this.packageDistanceFromLastAction) ? (avgForAction - this.packageDistanceFromLastAction) : (this.packageDistanceFromLastAction - avgForAction);
-		System.out.println(">>>>>>> averagePackageDistanceDiffForAction: " + this.averagePackageDistanceDiffForAction);
+		logger.debug(">>>>>>> averagePackageDistanceDiffForAction: " + this.averagePackageDistanceDiffForAction);
 		
 		final int maxPackageDistance = context.getMaxPackageDistance();
 		this.maxPackageDistanceDiff = (maxPackageDistance >= this.packageDistanceFromLastAction) ? (maxPackageDistance - this.packageDistanceFromLastAction) : (this.packageDistanceFromLastAction - maxPackageDistance);
@@ -249,6 +271,16 @@ public abstract class EclipseAction {
 			final int totalTransitions = (context.getTotalActionsCount() - 2 > 1) ? context.getTotalActionsCount() - 2 : 1;
 			this.sameActionsTransitionsRatio = (double) this.sameActionsTransitionsCount / totalTransitions;
 		} 
+		
+	}
+	
+	private void applyContextToResources(final TaskContext context) {
+		this.resourcesUsedCount = context.getTotalReources();
+		this.packagesUsedCount = context.getTotalPackages();
+		
+		this.packagesWorkedBefore = context.packageWorkedWithAlready(this.resource);
+		this.resourcesWorkedBefore = context.resourceWorkedWithAlready(this.resource);
+		
 		
 	}
 
@@ -319,6 +351,25 @@ public abstract class EclipseAction {
 	public EclipseAction getLastAction() {
 		return this.lastAction;
 	}
+
+	public int getResourcesWorkedBefore() {
+		return this.resourcesWorkedBefore;
+	}
+
+	public int getPackagesWorkedBefore() {
+		return this.packagesWorkedBefore;
+	}
+
+	public int getPackagesUsedCount() {
+		return this.packagesUsedCount;
+	}
+
+	public int getResourcesUsedCount() {
+		return this.resourcesUsedCount;
+	}
+	
+	
+	
 	
 	
 }

@@ -3,12 +3,15 @@ package eclipselogger.context;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import eclipselogger.events.EclipseResource;
 import eclipselogger.events.actions.ActionType;
 import eclipselogger.events.actions.EclipseAction;
 import eclipselogger.utils.FileChanges;
+import eclipselogger.utils.PackageUtils;
 
 public class TaskContext {
 	
@@ -18,6 +21,9 @@ public class TaskContext {
 	private int totalActionsCount;
 	
 	private final List<EclipseAction> contextActions = new ArrayList<EclipseAction>();
+	
+	private final Map<String, Integer> contextResources = new HashMap<String, Integer>();
+	private final Map<String, Integer> contextPackages = new HashMap<String, Integer>();
 	
 	//private final HashMap<ActionType, FileChanges> fileChangesPerAction = new HashMap<ActionType, FileChanges>();
 	
@@ -37,6 +43,9 @@ public class TaskContext {
 	private final HashMap<ActionType, Double> averagePackageDistancePerAction = new HashMap<ActionType, Double>();
 	private final HashMap<ActionType, Integer> totalPackageDistancePerAction = new HashMap<ActionType, Integer>();
 	
+	private int totalResourceCount;
+	private int totalPackageCount;
+	
 	private final FileChanges overallFileChanges = new FileChanges();
 	private FileChanges lastFileChanges = new FileChanges();
 	private FileChanges averageFileChanges = new FileChanges();
@@ -44,14 +53,19 @@ public class TaskContext {
 	
 	public void updateContextWithAction(final EclipseAction action) {
 		logger.debug("Starting to update task context with action:");
-		logger.debug(action.toString());
-		this.totalActionsCount++;
-		this.contextActions.add(action);
-		updateCounter(action);
-		updateDurations(action);
-		updatePackageDistances(action);
-		logger.debug("Update of context ended successfully");
-		
+		try {
+			logger.debug(action.toString());
+			this.totalActionsCount++;
+			this.contextActions.add(action);
+			updateCounter(action);
+			updateDurations(action);
+			updatePackageDistances(action);
+			updateResources(action);
+			logger.debug("Update of context ended successfully");
+		} catch (final Exception e) {
+			logger.error("Update of context failed", e);
+		}
+
 	}
 	
 	private void updateCounter(final EclipseAction action) {
@@ -125,6 +139,27 @@ public class TaskContext {
 		}
 		
 		
+	}
+	
+	private void updateResources(final EclipseAction action) {
+		 final String resource = action.getResource().getProjectRelativePath();
+		 Integer resourceUses = this.contextResources.get(resource);
+		 if (resourceUses != null) {
+			 resourceUses++;
+		 } else {
+			 this.contextResources.put(resource, new Integer(1));	 
+		 }
+		 this.totalResourceCount = this.contextResources.size();
+		 
+		 final String workingPackage = PackageUtils.getPackageFromResource(action.getResource());
+		 
+		 Integer packageUses = this.contextPackages.get(workingPackage);
+		 if (packageUses != null) {
+			 packageUses++;
+		 } else {
+			 this.contextPackages.put(workingPackage, new Integer(1));
+		 }
+		 this.totalPackageCount = this.contextPackages.size();
 	}
 	
 	public void updateFileChanges(final FileChanges changes) {
@@ -252,5 +287,33 @@ public class TaskContext {
 		}
 		
 		return count;
+	}
+	
+	public int resourceWorkedWithAlready(final EclipseResource res) {
+		final String resourcePath = res.getProjectRelativePath();
+		final Integer count = this.contextResources.get(resourcePath);
+		if (count == null) {
+			return 0;
+		}
+		
+		return count;
+	}
+	
+	public int packageWorkedWithAlready(final EclipseResource res) {
+		final String packagePath = PackageUtils.getPackageFromResource(res);
+		final Integer count = this.contextPackages.get(packagePath);
+		if (count == null) {
+			return 0;
+		}
+		
+		return count;
+	}
+	
+	public int getTotalPackages() {
+		return this.totalPackageCount;
+	}
+	
+	public int getTotalReources() {
+		return this.totalResourceCount;
 	}
 }

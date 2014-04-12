@@ -15,6 +15,11 @@ public class ActionDB {
 	public static final String PACKAGE_DISTANCE = "package_distance";
 	
 	// context
+	public static final String TOTAL_PACKAGES = "total_packages";
+	public static final String TOTAL_RESOURCES = "total_resources";
+	public static final String PACKAGE_WORKED_BEFORE = "package_before";
+	public static final String RESOURCE_WORKED_BEFORE = "resource_before";
+	
 	public static final String RECENT_LINES_ADDED = "recent_lines_added";
 	public static final String RECENT_LINES_CHANGED = "recent_lines_changed";
 	public static final String RECENT_LINES_DELETED = "recent_lines_deleted";

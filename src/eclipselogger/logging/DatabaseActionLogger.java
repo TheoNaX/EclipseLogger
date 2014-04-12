@@ -349,8 +349,9 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 		final String sql = "INSERT INTO eclipse_action(last_action, time_since_last, action, context_change, last_actions, recent_same_actions_count, send_status, "
 				+ "time_stamp, package_distance, recent_lines_added, recent_lines_changed, recent_lines_deleted, average_lines_added, average_lines_changed, average_lines_deleted, "
 				+ "average_package_diff, average_package_action_diff, max_package_diff, min_package_diff, average_duration_diff, average_duration_action_diff, max_duration_diff, "
-				+ "min_duration_diff, context_same_actions, same_actions_ratio, time_since_last_same, same_transitions_count, same_transitions_ratio) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+				+ "min_duration_diff, context_same_actions, same_actions_ratio, time_since_last_same, same_transitions_count, same_transitions_ratio, "
+				+ "package_before, resource_before, total_packages, total_resources) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?, ?,?)";
 		PreparedStatement ps = null;
 		try {
 			ps = this.dbHandler.prepareStatement(sql);
@@ -388,6 +389,12 @@ public class DatabaseActionLogger implements EclipseActiontLogIF {
 			ps.setLong(26, action.getTimeSinceLastSameAction());
 			ps.setInt(27, action.getSameActionsTransitionsCount());
 			ps.setDouble(28, action.getSameActionsTransitionsRatio());
+			
+			ps.setInt(29, action.getPackagesWorkedBefore());
+			ps.setInt(30, action.getResourcesWorkedBefore());
+			ps.setInt(31, action.getPackagesUsedCount());
+			ps.setInt(32, action.getResourcesUsedCount());
+			
 			
 			ps.executeUpdate();
 		}

@@ -1,7 +1,9 @@
 package eclipselogger.utils;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 
+import eclipselogger.events.EclipseResource;
 import eclipselogger.resources.EclipseFile;
 import eclipselogger.resources.EclipseFolder;
 
@@ -102,6 +104,31 @@ public class PackageUtils {
 		}
 		
 		return result;
+	}
+	
+	public static String getPackageFromResource(final EclipseResource resource) {
+		String ePackage = null;
+		if (resource.getType() == IResource.FOLDER) {
+			final EclipseFolder folder = (EclipseFolder) resource;
+			final String folderParentPath = folder.getParentPath();
+			ePackage = folderParentPath;
+		} else if (resource.getType() == IResource.FILE) {
+			final EclipseFile file = (EclipseFile) resource;
+			ePackage = getPackageFromFile(file);
+		}
+		
+		if (ePackage == null) {
+			ePackage = "root";
+		}
+		return ePackage;
+		
+	}
+
+	private static String getPackageFromFile(final EclipseFile file) {
+		String filePath = file.getProjectRelativePath();
+		filePath = filePath.substring(0, filePath.indexOf(file.getFileName()));
+		
+		return filePath;
 	}
 	
 }
