@@ -88,7 +88,7 @@ public class RefactorPackageAction extends EclipseAction {
 	public String toString() {
 		return "Action: " + getActionType() + 
 				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", refactor type: " + this.refactorType + "\n" +
-				", refactored package: " + this.refactoredPackage + ", previous file: " + this.previousFile;
+				", refactored package: " + this.refactoredPackage + "\n, previous file: " + this.previousFile;
 	}
 
 	public static DynamicQuery createQuery() {
@@ -106,5 +106,12 @@ public class RefactorPackageAction extends EclipseAction {
 		query.setJoinColumnForJoinedTable(ActionDB.ECLIPSE_ACTION_ID);
 		
 		return query;
+	}
+
+	@Override
+	public String toStringForViewer() {
+		return "Action: " + getActionType() + 
+				", same package: " + this.samePackage + ", same project: " + this.sameProject + "\n" +
+				", refactored package: " + this.refactoredPackage + ", previous file: " + this.previousFile + ", CONTEXT CHANGE: " + this.contextChange;
 	}
 }

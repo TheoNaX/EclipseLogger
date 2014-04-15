@@ -106,8 +106,21 @@ public class CloseFileAction extends EclipseAction {
 	public String toString() {
 		return "Action: " + getActionType() + 
 				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
+				", closed file: " + this.closedFile + "\n, previous file: " + this.previousFile; 
+	}
+	
+	public String toString2() {
+		return "Action: " + getActionType() + 
+				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
 				", closed file: " + this.closedFile + ", previous file: " + this.previousFile + "\n" + 
 				"Lines: deleted: " + this.fileChanges.getDeletedLines() + ", added: " + this.fileChanges.getAddedLines() + ", changed: " + this.fileChanges.getChangedLines() + "\n" + 
 				"Working time: " + this.workingTime;
+	}
+
+	@Override
+	public String toStringForViewer() {
+		return "Action: " + getActionType() + 
+				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
+				", closed file: " + this.closedFile + "\n previous file: " + this.previousFile + ", CONTEXT CHANGE: " + this.contextChange;
 	}
 }

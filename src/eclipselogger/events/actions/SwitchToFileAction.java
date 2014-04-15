@@ -70,7 +70,7 @@ public class SwitchToFileAction extends EclipseAction {
 	public String toString() {
 		return "Action: " + getActionType() + 
 				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
-				", switched file: " + this.switchedToFile + ", previous file: " + this.previousFile;
+				", switched file: " + this.switchedToFile + "\n, previous file: " + this.previousFile;
 	}
 
 	public static DynamicQuery createQuery() {
@@ -86,6 +86,13 @@ public class SwitchToFileAction extends EclipseAction {
 		query.setJoinColumnForJoinedTable(ActionDB.ECLIPSE_ACTION_ID);
 		
 		return query;
+	}
+
+	@Override
+	public String toStringForViewer() {
+		return "Action: " + getActionType() + 
+				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
+				", switched file: " + this.switchedToFile + ", previous file: " + this.previousFile  + ", CONTEXT CHANGE: " + this.contextChange;
 	}
 	
 }

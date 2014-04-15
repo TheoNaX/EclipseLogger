@@ -19,7 +19,7 @@ public abstract class EclipseAction {
 	protected long timeSinceLastAction;
 	protected int previousAction;
 	protected int action_id;
-	private boolean contextChange;
+	protected boolean contextChange;
 	protected Date timestamp;
 	protected String recentActions;
 	protected int recentSameActionsCount;
@@ -369,7 +369,7 @@ public abstract class EclipseAction {
 	}
 	
 	
-	
+	public abstract String toStringForViewer();
 	
 	
 }

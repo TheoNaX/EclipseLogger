@@ -35,6 +35,7 @@ import eclipselogger.utils.ConfigReader;
 import eclipselogger.utils.FileChanges;
 import eclipselogger.utils.FileComparator;
 import eclipselogger.utils.PackageDistanceCalculator;
+import eclipselogger.views.LoggingView;
 
 public class EclipseActionMonitor {
 	
@@ -467,6 +468,13 @@ public class EclipseActionMonitor {
 			}
 		} catch (final Exception e) {
 			logger.error("logEclipseAction()", e);
+		}
+		
+		// Refresh table with unsent entries
+		try {
+			LoggingView.refreshViewer();
+		} catch (final Exception e) {
+			logger.error("Failed to refresh unsent actions viewer", e);
 		}
 	}
 	

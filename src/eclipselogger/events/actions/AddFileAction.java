@@ -88,8 +88,15 @@ public class AddFileAction extends EclipseAction {
 	
 	@Override
 	public String toString() {
-		return "Action: " + getActionType() + 
+		return "ACTION: " + getActionType() + 
 				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
-				", added file: " + this.addedFile + ", previous file: " + this.previousFile;
+				", added file: " + this.addedFile + "\n, previous file: " + this.previousFile;
+	}
+	
+	@Override
+	public String toStringForViewer() {
+		return "ACTION: " + getActionType() + 
+				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
+				", added file: " + this.addedFile + ", previous file: " + this.previousFile + ", CONTEXT CHANGE: " + this.contextChange;
 	}
 }

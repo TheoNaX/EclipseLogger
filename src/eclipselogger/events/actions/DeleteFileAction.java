@@ -109,8 +109,21 @@ public class DeleteFileAction extends EclipseAction {
 	public String toString() {
 		return "Action: " + getActionType() + 
 				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
+				", deleted file: " + this.deletedFile + "\n, previous file: " + this.previousFile; 
+	}
+	
+	public String toString2() {
+		return "Action: " + getActionType() + 
+				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
 				", deleted file: " + this.deletedFile + ", previous file: " + this.previousFile + "\n" + 
 				"Lines: deleted: " + this.changes.getDeletedLines() + ", added: " + this.changes.getAddedLines() + ", changed: " + this.changes.getChangedLines() + "\n" + 
 				"Working time: " + this.workingTime;
+	}
+
+	@Override
+	public String toStringForViewer() {
+		return "Action: " + getActionType() + 
+				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
+				", deleted file: " + this.deletedFile + "\n previous file: " + this.previousFile + ", CONTEXT CHANGE: " + this.contextChange;
 	}
 }

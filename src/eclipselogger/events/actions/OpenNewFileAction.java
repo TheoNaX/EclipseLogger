@@ -67,9 +67,16 @@ public class OpenNewFileAction extends EclipseAction {
 	
 	@Override
 	public String toString() {
-		return "Action: " + getActionType() + 
+		return "ACTION: " + getActionType() + 
 				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
-				", opened file: " + this.openedFile + ", previous file: " + this.previousFile;
+				", opened file: " + this.openedFile + "\n, previous file: " + this.previousFile;
+	}
+	
+	@Override
+	public String toStringForViewer() {
+		return "ACTION: " + getActionType() + 
+				", same package: " + this.samePackage + ", same project: " + this.sameProject + ", same type: " + this.sameFileType + "\n" +
+				", opened file: " + this.openedFile + ", previous file: " + this.previousFile + ", CONTEXT CHANGE: " + this.contextChange;
 	}
 	
 

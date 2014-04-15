@@ -1,8 +1,9 @@
 package eclipselogger.utils;
 
-import java.io.File;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -131,19 +132,18 @@ public class ConfigReader {
 	
 	public static void saveProperties() {
 		final String fileName = "config.properties";
-		File file;
-		FileOutputStream fo = null;
+		Writer output = null;
 		try {
-			file = new File(fileName);
-			fo = new FileOutputStream(file);
-			properties.store(fo, "Eclipse logger properties");
+			output = new BufferedWriter(new FileWriter(fileName, true));
+			output.append("\n");
+			output.append("\n");
+			output.append("# Generated User identification\n");
+			output.append("USER_ID = " + getUserId());
 		} catch (final Exception e) {
 			logger.error("Failed to save properties to file", e);
 		} finally {
 			try {
-				if (fo != null) {
-					fo.close();
-				}
+				output.close();
 			} catch (final Exception ignore) {}
 		}
 	}

@@ -77,7 +77,14 @@ public class AddPackageAction extends EclipseAction {
 	public String toString() {
 		return "Action: " + getActionType() + 
 				", same package: " + this.samePackage + ", same project: " + this.sameProject + "\n" +
-				", added package: " + this.addedPackage + ", previous file: " + this.previousFile;
+				", added package: " + this.addedPackage + "\n, previous file: " + this.previousFile;
+	}
+
+	@Override
+	public String toStringForViewer() {
+		return "Action: " + getActionType() + 
+				", same package: " + this.samePackage + ", same project: " + this.sameProject + "\n" +
+				", added package: " + this.addedPackage + ", previous file: " + this.previousFile + ", CONTEXT CHANGE: " + this.contextChange;
 	}
 	
 }

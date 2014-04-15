@@ -43,4 +43,17 @@ public class AddProjectAction extends EclipseAction {
 		return query;
 	}
 
+	
+	@Override
+	public String toString() {
+		return "Action: " + getActionType() + 
+				", Project name: " + this.projectName;
+	}
+	
+	@Override
+	public String toStringForViewer() {
+		return "Action: " + getActionType() + 
+				", Project name: " + this.projectName + ", CONTEXT CHANGE: " + this.contextChange;
+	}
+
 }

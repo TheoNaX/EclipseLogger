@@ -76,6 +76,13 @@ public class DeletePackageAction extends EclipseAction {
 	public String toString() {
 		return "Action: " + getActionType() + 
 				", same package: " + this.samePackage + ", same project: " + this.sameProject + "\n" +
-				", deleted package: " + this.deletedPackage + ", previous file: " + this.previousFile;
+				", deleted package: " + this.deletedPackage + "\n, previous file: " + this.previousFile;
+	}
+
+	@Override
+	public String toStringForViewer() {
+		return "Action: " + getActionType() + 
+				", same package: " + this.samePackage + ", same project: " + this.sameProject + "\n" +
+				", deleted package: " + this.deletedPackage + "\n previous file: " + this.previousFile + ", CONTEXT CHANGE: " + this.contextChange;
 	}
 }
