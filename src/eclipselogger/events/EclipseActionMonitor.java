@@ -496,6 +496,11 @@ public class EclipseActionMonitor {
 	
 	private static void showContextChangeDialog(final EclipseAction action) {
 		//final Shell parentShell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		if (!ConfigReader.getShowContextPopup()) {
+			logEclipseAction(action, false);
+			return;
+		}
+		
 		Display.getDefault().asyncExec(new Runnable() {
 		    @Override
 			public void run() {

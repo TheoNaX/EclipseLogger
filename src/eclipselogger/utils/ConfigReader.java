@@ -28,6 +28,8 @@ public class ConfigReader {
 	public static final String SFTP_TARGET_DIRECTORY = "SFTP_TARGET_DIRECTORY";
 	public static final String USER_ID = "USER_ID";
 	
+	public static final String SHOW_POPUP = "SHOW_POPUP";
+	
 	// REST specific 
 	// TODO
 	
@@ -116,6 +118,20 @@ public class ConfigReader {
 	
 	public static String getDbName() {
 		return properties.getProperty(DB_NAME, "eclipselog.db");
+	}
+	
+	public static boolean getShowContextPopup() {
+		final String strValue = properties.getProperty(SHOW_POPUP);
+		boolean result = true;
+		if (strValue != null) {
+			if (strValue.equalsIgnoreCase("1") || strValue.equalsIgnoreCase("yes")) {
+				result = true;
+			} else if (strValue.equalsIgnoreCase("0") || strValue.equalsIgnoreCase("no")) {
+				result = false;
+			}
+		}
+		
+		return result;
 	}
 	
 	public static String getUserId() {
