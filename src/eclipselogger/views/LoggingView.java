@@ -187,6 +187,10 @@ public class LoggingView extends ViewPart {
 		try {
 			logger.debug("Going to update context change for action " + action.getActionId());
 			this.loader.updateUnsentActionContextChange(action.getActionId(), context);
+			if (context) {
+				logger.debug("Resetting task context ...");
+				EclipseActionMonitor.resetTaskContext();
+			}
 			logger.debug("Context change successfully updated for action " + action.getActionId());
 			
 			viewer.refresh();
