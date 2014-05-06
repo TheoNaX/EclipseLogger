@@ -13,6 +13,16 @@ import eclipselogger.events.actions.EclipseAction;
 import eclipselogger.utils.FileChanges;
 import eclipselogger.utils.PackageUtils;
 
+/**
+ * 
+ * @author Tomas
+ * 
+ * This class represents programmer's task context in Eclipse IDE
+ * Contains all actions of actual context
+ * Contains parameters about actions package distance, duration, code changes.
+ * Task context stores also all resources and packages worked with within the task context 
+ *
+ */
 public class TaskContext {
 	
 	private static Logger logger = Logger.getLogger(TaskContext.class);
@@ -51,6 +61,11 @@ public class TaskContext {
 	private FileChanges averageFileChanges = new FileChanges();
 	
 	
+	/**
+	 * Adds Eclipse action to actual task context
+	 * Uses Eclipse action to update all task context parameters
+	 * @param action Eclipse action used to update actual task context
+	 */
 	public void updateContextWithAction(final EclipseAction action) {
 		logger.debug("Starting to update task context with action:");
 		try {
@@ -80,6 +95,10 @@ public class TaskContext {
 		}
 	}
 	
+	/**
+	 * Applies Eclipse action to update duration parameters
+	 * @param action Eclipse action belonging to actual task context
+	 */
 	private void updateDurations(final EclipseAction action) {
 		this.lastActionDuration = action.getTimeSinceLastAction();
 		if (this.lastActionDuration > this.maxActionDuration) {
@@ -111,6 +130,10 @@ public class TaskContext {
 		
 	}
 	
+	/**
+	 * Applies Eclipse action to update package distance parameters
+	 * @param action Eclipse action belonging to actual task context
+	 */
 	private void updatePackageDistances(final EclipseAction action) {
 		final int packageDistance = action.getPackageDistanceFromLastAction();
 		if (packageDistance > this.maxPackageDistance) {
@@ -141,6 +164,10 @@ public class TaskContext {
 		
 	}
 	
+	/**
+	 * Applies Eclipse action to update resources and packages counters
+	 * @param action Eclipse action belonging to actual task context
+	 */
 	private void updateResources(final EclipseAction action) {
 		 final String resource = action.getResource().getProjectRelativePath();
 		 Integer resourceUses = this.contextResources.get(resource);
@@ -162,6 +189,10 @@ public class TaskContext {
 		 this.totalPackageCount = this.contextPackages.size();
 	}
 	
+	/**
+	 * Applies Eclipse action to update counters for added, modified and deleted lines of code
+	 * @param action Eclipse action belonging to actual task context
+	 */
 	public void updateFileChanges(final FileChanges changes) {
 		this.overallFileChanges.updateFileChanges(changes);
 		
@@ -234,6 +265,11 @@ public class TaskContext {
 		return this.contextActions;
 	}
 	
+	/**
+	 * Returns average action duration for given action type
+	 * @param type Type of action
+	 * @return duration in milliseconds
+	 */
 	public long getAverageDurationForAction(final ActionType type) {
 		final Long duration = this.averageDurationPerAction.get(type);
 		if (duration != null) {
@@ -243,6 +279,10 @@ public class TaskContext {
 		}
 	}
 	
+	/**
+	 * Returns average distance from previous action for given action type
+	 * @param type Type of action
+	 */
 	public double getAveragePackageDistanceForAction(final ActionType type) {
 		final Double distance = this.averagePackageDistancePerAction.get(type);
 		if (distance != null) {
@@ -252,6 +292,10 @@ public class TaskContext {
 		}
 	}
 	
+	/**
+	 * Returns last previous action of the same type
+	 * @param type Type of action
+	 */
 	public EclipseAction getLastSameAction(final ActionType type) {
 		EclipseAction action = null;
 		final int count = this.contextActions.size();
@@ -266,6 +310,11 @@ public class TaskContext {
 		return action;
 	}
 	
+	/**
+	 * Returns count of previous actions of the same type 
+	 * @param type Type of action
+	 * @return Count of actions or 0 if no previous action of the same type executed within task context 
+	 */
 	public int getSameActionsCount(final ActionType type) {
 		int count = 0;
 		for (int i=0; i<this.contextActions.size(); i++) {
@@ -277,6 +326,14 @@ public class TaskContext {
 		return count;
 	}
 	
+	/**
+	 * Returns count of previous transitions from first to second action type within the task context.
+	 * Examples: 1st action delete file, 2nd action open file
+	 *           1st action close file, 2nd action open file 
+	 * @param first First action type
+	 * @param second Second action type
+	 * @return Count of previous same transitions or 0 if no such transition in task context before
+	 */
 	public int getSameActionsTransitions(final ActionType first, final ActionType second) {
 		int count = 0;
 		final int actionsCount = this.contextActions.size();
@@ -289,6 +346,10 @@ public class TaskContext {
 		return count;
 	}
 	
+	/**
+	 * Returns count of actions that were executed with given Eclipse resource
+	 * @param res Working Eclipse resource
+	 */
 	public int resourceWorkedWithAlready(final EclipseResource res) {
 		final String resourcePath = res.getProjectRelativePath();
 		final Integer count = this.contextResources.get(resourcePath);
@@ -299,6 +360,10 @@ public class TaskContext {
 		return count;
 	}
 	
+	/**
+	 * Returns count of actions that were executed in given package
+	 * @param res Working Eclipse resource
+	 */
 	public int packageWorkedWithAlready(final EclipseResource res) {
 		final String packagePath = PackageUtils.getPackageFromResource(res);
 		final Integer count = this.contextPackages.get(packagePath);

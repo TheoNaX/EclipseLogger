@@ -37,6 +37,12 @@ import eclipselogger.utils.FileComparator;
 import eclipselogger.utils.PackageDistanceCalculator;
 import eclipselogger.views.LoggingView;
 
+/**
+ * This class represents a singleton used for monitoring all actions executed in Eclipse IDE
+ * All EclipseAction objects are created here, methods are called from Eclipse event listeners
+ * @author Tomas
+ *
+ */
 public class EclipseActionMonitor {
 	
 	private static EclipseFile actualFile;
@@ -48,30 +54,47 @@ public class EclipseActionMonitor {
 	
 	private static Logger logger = Logger.getLogger(EclipseActionMonitor.class);
 	
-	// loggers
+	/**
+	 * Default database logger - inserting actions into database
+	 */
 	private static EclipseActiontLogIF dbLogger = new DatabaseActionLogger();
 	
-	// popup window for confirming context change
+	/**
+	 * Popup window for confirming context change
+	 */
 	private static ContextChangeDialog contextDialog;
 	
-	// list of loggers to log Eclipse actions
+	/**
+	 * List of loggers to log Eclipse actions 
+	 */
 	private static final List<EclipseActiontLogIF> loggers = new ArrayList<EclipseActiontLogIF>();
 	
-	// cache used for storing content of actual file. This content is used to compute file changes
+	/**
+	 * Cache used for storing content of actual file. This content is used to compute file changes
+	 */
 	private static ActualFileContentCache fileContentCache = new ActualFileContentCache(); 
 	
-	// hash map of working files. Contains all opened files and key to map is project path to file
+	/**
+	 * Hash map of working files. Contains all opened files and key to map is project path to file 
+	 */
 	private static HashMap<String, WorkingFile> workingFiles = new LinkedHashMap<String, WorkingFile>();
 	
-	// cache used for storing recent actions
+	/**
+	 * Cache used for storing recent actions
+	 */
 	private static ActionsCache recentActions = new ActionsCache();
 	
-	// task context of user
+	/**
+	 * Actual task context of user
+	 */
 	private static TaskContext taskContext = new TaskContext();
 	
-	// initialization of Eclipse action loggers
-	// database logger is used always to store actions in SQLite db an then can be sent to server
-	// other loggers are configurable
+	
+	/**
+	 * Initialization of Eclipse action loggers
+	 * Database logger is used always to store actions in SQLite db an then can be sent to server
+	 * Other loggers are configurable
+	 */
 	public static void init() {
 		loggers.add(dbLogger);
 		if (ConfigReader.getLoggers().contains(EclipseActiontLogIF.LOG4J_LOGGER)) {
@@ -85,11 +108,19 @@ public class EclipseActionMonitor {
 		
 	}
 	
+	/**
+	 * Reset of task context
+	 * Task context is built from beginning
+	 */
 	public static void resetTaskContext() {
 		logger.info("Resetting programmer's context...");
 		taskContext = new TaskContext();
 	}
 	
+	/**
+	 * Update actual task context with action belonging to the task context 
+	 * @param action Eclipse action that belongs to the task context
+	 */
 	public static void updateTaskContextWithFinishedAction(final EclipseAction action) {
 		logger.info("Last action was not context change, updating task context");
 		try {
@@ -100,6 +131,12 @@ public class EclipseActionMonitor {
 	}
 	
 	
+	/**
+	 * Sets actual working file
+	 * Stores actual file content and updates file changes for previous file
+	 * @param file
+	 * @param fileContent
+	 */
 	public static void setActualFile(final EclipseFile file, final String fileContent) {
 		if (file == null) {
 			logger.error(">>> setActualFile() called with null parameter");
@@ -178,6 +215,11 @@ public class EclipseActionMonitor {
 		}
 	}
 	
+	/**
+	 * Collects all required data and creates CloseFileAction
+	 * Displays dialog with information about the close action
+	 * @param file Closed file
+	 */
 	public static synchronized void closeFile(final EclipseFile file) {
 		if (file == null) {
 			logger.error("closeFile() called with null file");
@@ -220,6 +262,12 @@ public class EclipseActionMonitor {
 		}
 	}
 	
+	/**
+	 * Collects all required data and creates a new OpenNewFileAction object.
+	 * Displays dialog with information about the open action 
+	 * @param file Opened file
+	 * @param fileContent Actual content of opened file
+	 */
 	public static void openNewFile(final EclipseFile file, final String fileContent) {
 		if (file == null) {
 			logger.error("openNewFile() called with null file");
@@ -254,6 +302,12 @@ public class EclipseActionMonitor {
 		}
 	}
 	
+	/**
+	 * Collects all required data and creates a new SwitchToFileAction object.
+	 * Displays dialog with information about the switch action 
+	 * @param file Switched file
+	 * @param fileContent Actual content of switched file
+	 */
 	public synchronized static void switchToFile(final EclipseFile file, final String fileContent) {
 		if ((file == null) || (actualFile != null && actualFile.equals(file))) {
 			logger.debug("Switch executed on file already switched");
@@ -279,6 +333,12 @@ public class EclipseActionMonitor {
 		}
 	}
 	
+	/**
+	 * Collects all required data and creates a new RefactorPackageAction object
+	 * Called when package or folder is moved or renamed
+	 * @param oldPack Old package / folder 
+	 * @param newPack Refactored package / folder
+	 */
 	public static void refactorPackage(final EclipseFolder oldPack, final EclipseFolder newPack) {
 		if (oldPack == null || newPack == null) {
 			logger.error("refactorPackage() called with null");
@@ -303,7 +363,12 @@ public class EclipseActionMonitor {
 		}
 	}
 	
-	
+	/**
+	 * Collects all required data and creates a new RefactorFileAction object
+	 * Called when file is moved or renamed
+	 * @param oldFile File before refactoring
+	 * @param newFile Refactored file
+	 */
 	public static void refactorFile(final EclipseFile oldFile, final EclipseFile newFile) {
 		if (oldFile == null || newFile == null) {
 			logger.error("refactorFile() called with null!");
@@ -328,6 +393,10 @@ public class EclipseActionMonitor {
 		}
 	}
 	
+	/**
+	 * Called if new folder / package is added in project
+	 * @param folder Added folder / package
+	 */
 	public static void addFolder(final EclipseFolder folder) {
 		if (folder == null) {
 			logger.error("addFolder() called with null !");
@@ -351,6 +420,10 @@ public class EclipseActionMonitor {
 		}
 	}
 	
+	/**
+	 * Called when folder / package is deleted from project
+	 * @param folder Deleted package / folder
+	 */
 	public static synchronized void deleteFolder(final EclipseFolder folder) {
 		if (folder == null) {
 			logger.error("deleteFolder() called with null parameter !");
@@ -375,6 +448,10 @@ public class EclipseActionMonitor {
 		}
 	}
 	
+	/**
+	 * Called when a new file is added to the project
+	 * @param file Added file
+	 */
 	public static void addFile(final EclipseFile file) {
 		if (file == null) {
 			logger.error("addFile() called with null parameter !");
@@ -399,6 +476,10 @@ public class EclipseActionMonitor {
 	}
 	
 	// TODO why previous file is null
+	/**
+	 * Called when a file is deleted from project 
+	 * @param file Deleted file
+	 */
 	public static synchronized void deleteFile(final EclipseFile file) {
 		if (file == null) {
 			logger.error("deleteFile() called with null parameter");
@@ -431,6 +512,10 @@ public class EclipseActionMonitor {
 	}
 	
 
+	/**
+	 * Called when new project is created in workspace
+	 * @param project New project
+	 */
 	public static void addProject(final EclipseProject project) {
 		if (project == null) {
 			logger.error("addProject() called with null parameter !");
@@ -455,6 +540,13 @@ public class EclipseActionMonitor {
 		recentActions.addEclipseActionToChache(action);
 	}
 	
+	/**
+	 * Log eclipse action via all registered loggers
+	 * Eclipse action is always inserted into database
+	 * If action represents context change, task context is reseted, otherwise task context is updated
+	 * @param action
+	 * @param contextChange
+	 */
 	public static void logEclipseAction(final EclipseAction action, final boolean contextChange) {
 		logger.debug("Logging Eclipse action ...");
 		try {

@@ -12,6 +12,13 @@ import eclipselogger.db.DynamicQuery;
 import eclipselogger.events.EclipseResource;
 import eclipselogger.utils.FileChanges;
 
+/**
+ * Abstract class representing each action executed in Eclipse IDE
+ * Contains common parameters for all action types
+ * Contains task context specific parameters
+ * @author Tomas
+ *
+ */
 public abstract class EclipseAction {
 	
 	private static Logger logger = Logger.getLogger(EclipseAction.class);
@@ -59,6 +66,14 @@ public abstract class EclipseAction {
 	
 	private EclipseAction lastAction;
 	
+	/**
+	 * Constructor used by Eclipse IDE event listeners when actions are executed 
+	 * @param timeSinceLastAction Time since previous action in milliseconds
+	 * @param previousAction Previous action
+	 * @param recentActions String containing comma separated list of recent actions
+	 * @param recentSameActionsCount Count of recent actions of the same type
+	 * @param packageDistance Package tree distance from the last action
+	 */
 	public EclipseAction(final long timeSinceLastAction, final EclipseAction previousAction, final String recentActions, final int recentSameActionsCount, final int packageDistance) {
 		this.timeSinceLastAction = timeSinceLastAction;
 		this.previousAction = (previousAction != null) ? previousAction.getActionType().getValue() : 0;
@@ -69,6 +84,11 @@ public abstract class EclipseAction {
 		this.lastAction = previousAction;
 	}
 	
+	/**
+	 * Constructor used by database Eclipse action loader, creates Eclipse action from ResultSet
+	 * @param rs ResultSet containing select from eclipse_action table and set to a non null row
+	 * @throws SQLException
+	 */
 	public EclipseAction(final ResultSet rs) throws SQLException {
 		this.timeSinceLastAction = rs.getLong(ActionDB.TIME_SINCE_LAST);
 		this.previousAction = rs.getInt(ActionDB.LAST_ACTION);
@@ -124,6 +144,10 @@ public abstract class EclipseAction {
 		return changes;
 	}
 	
+	/**
+	 * Must be implemented by all Eclipse actions
+	 * @return Type of action
+	 */
 	public abstract ActionType getActionType(); 
 	
 	public long getTimeSinceLastAction() {
@@ -150,6 +174,11 @@ public abstract class EclipseAction {
 		return this.recentSameActionsCount;
 	}
 	
+	/**
+	 * Creates DynamicQuery used for select from database from eclipse_action table
+	 * Adds to query all common and context specific parameters
+	 * @return DynamicQuery with select of all common and context columns
+	 */
 	public static DynamicQuery createQuery() {
 		final DynamicQuery query = new DynamicQuery(TABLE_NAME);
 		query.addColumnToSelect(ActionDB.ECLIPSE_ACTION_ID);
@@ -206,7 +235,11 @@ public abstract class EclipseAction {
 		this.resource = resource;
 	}
 	
-	
+	/**
+	 * Applies actual task context to Eclipse action
+	 * Sets all context specific parameters
+	 * @param context Actual task context
+	 */
 	public void applyContext(final TaskContext context) {
 		this.mostRecentFileChanges = context.getLastFileChanges();
 		this.averageFileChanges = context.getAverageFileChanges();
