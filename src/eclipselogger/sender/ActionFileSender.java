@@ -8,6 +8,20 @@ import eclipselogger.db.ActionLoader;
 import eclipselogger.events.actions.EclipseAction;
 import eclipselogger.utils.ConfigReader;
 
+/**
+ * Eclipse actions sender thread
+ * This thread periodically loads all unsent actions from SQLite database and tries to upload them to server
+ * Sender thread can use one of three possible actions senders:
+ * <ul>
+ *  <li>SFTP uploader</SFTP>
+ *  <li>Local disk sender</li>
+ *  <li>REST sender</li>
+ * </ul>
+ * 
+ * Timeout between sending attempts can be configured via FILE_SEND_INTERVAL property
+ * @author Tomas
+ *
+ */
 public class ActionFileSender implements Runnable {
 	
 	private final static Logger logger = Logger.getLogger(ActionFileSender.class);
@@ -33,6 +47,12 @@ public class ActionFileSender implements Runnable {
 		this.runner.start();
 	}
 	
+	/**
+	 * Create sender for Eclipse actions uploading based on FILE_UPLOADER_TYPE property
+	 * By default SFTP uploader is used
+	 * @return Initialized actions uploader
+	 * @throws Exception
+	 */
 	private static ActionUploaderIF createSender() throws Exception {
 		ActionUploaderIF sender = null;
 		logger.debug("Going to create sender...");
@@ -70,6 +90,10 @@ public class ActionFileSender implements Runnable {
 		
 	}
 	
+	/**
+	 * Loads all unsent Eclipse actions from database and tries to upload them to server
+	 * Periodically called from run() method
+	 */
 	private synchronized void processUnsentEclipseActions() {
 		List<EclipseAction> unsentActions = null;
 		
@@ -93,6 +117,9 @@ public class ActionFileSender implements Runnable {
 		}
 	}
 	
+	/**
+	 * Stops sending thread
+	 */
 	public synchronized void stopSenderThread() {
 		try {
 			this.shouldStop = true;
